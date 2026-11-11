@@ -184,7 +184,7 @@ async function submitCustomer(e) {
             loadCustomers();
         }
     } catch (err) {
-        alert("Cloud connection timed out.");
+        alert("Error details: " + err.message);
     } finally {
         btn.disabled = false;
     }
@@ -279,7 +279,7 @@ async function submitHotel(e) {
             loadAgentData(currentAgentId);
         }
     } catch (err) {
-        alert("Cloud connection timed out.");
+        alert("Error details: " + err.message);
     } finally {
         btn.disabled = false;
     }
