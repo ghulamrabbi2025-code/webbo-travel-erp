@@ -19,12 +19,12 @@ app.get('/api/payroll/:employeeId', async (req, res) => {
   try {
     const empRes = await pool.query('SELECT * FROM employees WHERE employee_id = $1', [parseInt(employeeId, 10)]);
     if (empRes.rows.length === 0) return res.status(404).json({ error: 'Employee not found' });
-    const employee = empRes.rows[0];
+   const employee = empRes.rows[0];
 
-    const visaMargin = await pool.query('SELECT COALESCE(SUM(margin_earned), 0) as sum FROM visa_bookings WHERE employee_id = $1', [parseInt(employeeId, 10)]);
-    const flightMargin = await pool.query('SELECT COALESCE(SUM(margin_earned), 0) as sum FROM flight_tickets WHERE employee_id = $1', [parseInt(employeeId, 10)]);
+const visaMargin = await pool.query('SELECT COALESCE(SUM(margin_earned), 0) as sum FROM visa_bookings WHERE employee_id = $1', [parseInt(employeeId, 10)]);
+const flightMargin = await pool.query('SELECT COALESCE(SUM(margin_earned), 0) as sum FROM flight_tickets WHERE employee_id = $1', [parseInt(employeeId, 10)]);
 
-    const totalSalesMargin = parseFloat(visaMargin.rows[0].sum) + parseFloat(flightMargin.rows[0].sum);
+const totalSalesMargin = parseFloat(visaMargin.rows[0].sum) + parseFloat(flightMargin.rows[0].sum);
     const commissionEarned = totalSalesMargin * (parseFloat(employee.commission_rate) / 100);
     const netPayout = parseFloat(employee.base_salary) + commissionEarned;
 
