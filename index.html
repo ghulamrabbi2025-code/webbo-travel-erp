@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Travel ERP Portal</title>
-    <!-- Tailwind CSS Engine for beautiful visuals -->
     <script src="https://tailwindcss.com"></script>
-    <!-- Modern Premium Font -->
     <link href="https://googleapis.com" rel="stylesheet">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
@@ -14,7 +12,7 @@
 </head>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col">
 
-    <!-- High-End Gradient Navigation Bar -->
+    <!-- Navigation Bar -->
     <nav class="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 text-white shadow-xl px-4 py-4 sticky top-0 z-50 border-b border-emerald-900/20">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
@@ -35,7 +33,7 @@
                     <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
                 </span>
                 <div class="text-xs font-semibold bg-white/10 backdrop-blur-md px-3 py-2 rounded-xl border border-white/10 text-emerald-100 tracking-wide">
-                    🟢 Station Mode: Localhost Data Bridge
+                    🟢 Cloud Live: Neon + Render Connected
                 </div>
             </div>
         </div>
@@ -51,7 +49,6 @@
                 <p class="text-xs md:text-sm text-slate-500 font-medium">Select an active internal consultant profile to audit real-time travel revenue matrices.</p>
             </div>
             
-            <!-- Agent Switcher Buttons -->
             <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200/50 self-start md:self-center">
                 <button id="btnAgent1" onclick="loadAgentData(1)" class="px-4 py-2.5 bg-white text-emerald-800 rounded-lg text-xs md:text-sm font-bold shadow-sm transition-all duration-200 tracking-wide">
                     Consultant (ID: 1)
@@ -64,18 +61,16 @@
 
         <!-- 3-Column Smart Metric Cards Layout -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Card 1: Agent Details -->
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80 border-t-4 border-t-blue-500 relative overflow-hidden group hover:shadow-md transition-all duration-200">
                 <span class="text-[10px] font-bold text-blue-600 uppercase tracking-widest bg-blue-50 px-2 py-1 rounded-md">Active Workspace</span>
-                <h3 id="agentName" class="text-2xl font-black text-slate-800 mt-3 tracking-tight">Mahbub Rahman</h3>
-                <p id="agentRole" class="text-xs text-slate-500 font-semibold mt-0.5">Senior Travel Consultant</p>
+                <h3 id="agentName" class="text-2xl font-black text-slate-800 mt-3 tracking-tight">Loading...</h3>
+                <p id="agentRole" class="text-xs text-slate-500 font-semibold mt-0.5">Syncing with Cloud...</p>
                 <div class="mt-5 pt-3 border-t border-slate-100 flex justify-between text-xs font-medium">
                     <span class="text-slate-400">Base Contract:</span>
-                    <span id="cardBaseSalary" class="font-bold text-slate-700">BDT 45,000.00</span>
+                    <span id="cardBaseSalary" class="font-bold text-slate-700">BDT 0.00</span>
                 </div>
             </div>
 
-            <!-- Card 2: Revenue Metrics -->
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80 border-t-4 border-t-amber-500 relative overflow-hidden hover:shadow-md transition-all duration-200">
                 <span class="text-[10px] font-bold text-amber-600 uppercase tracking-widest bg-amber-50 px-2 py-1 rounded-md">Accumulated Volume</span>
                 <h3 id="salesMargin" class="text-2xl font-black text-slate-800 mt-3 tracking-tight">BDT 0.00</h3>
@@ -86,10 +81,9 @@
                 </div>
             </div>
 
-            <!-- Card 3: Payout -->
             <div class="bg-gradient-to-br from-emerald-600 to-teal-700 p-6 rounded-2xl shadow-md text-white relative overflow-hidden hover:shadow-lg transition-all duration-200">
                 <span class="text-[10px] font-bold text-emerald-200 uppercase tracking-widest bg-white/10 px-2 py-1 rounded-md border border-white/10">Disbursement Ledger</span>
-                <h3 id="netPayout" class="text-3xl font-black text-white mt-3 tracking-tight">BDT 45,000.00</h3>
+                <h3 id="netPayout" class="text-3xl font-black text-white mt-3 tracking-tight">BDT 0.00</h3>
                 <p class="text-xs text-emerald-100/90 font-medium mt-0.5">Net Consolidated Payable Salary</p>
                 <div class="mt-4 pt-3 border-t border-white/10 flex justify-between items-center text-xs">
                     <span class="text-emerald-200 font-medium">Payroll Authorization:</span>
@@ -98,7 +92,7 @@
             </div>
         </div>
 
-        <!-- 3-Column Highly Organized Forms & Table Section -->
+        <!-- 3-Column Forms & Table Section -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
             <!-- COLUMN 1: TOURIST VISA FORM -->
@@ -138,6 +132,13 @@
 
                     <button type="submit" class="w-full mt-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold p-3 rounded-xl shadow-md transition-all text-xs tracking-wide">
                         💾 Save Visa Entry
+                    </button>
+                </form>
+            </div>
+
+            <!-- COLUMN 2: AIR TICKETING FORM -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 space-y-4">
+                <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
 ✈️
 
 Log Flight Ticket PNR
@@ -157,18 +158,18 @@ Live Pay Sheet Summary
 
 Audited
 
-Salary Registry Component
-	Calculated Amount (BDT)
+Salary Registry Component	Amount (BDT)
 Guaranteed Office Base Pay
-	BDT 45,000.00
+	BDT 0.00
 Travel Booking Margins Commission Share
 	• BDT 0.00
 Total Net Payout
-	BDT 45,000.00
+	BDT 0.00
 
-🔒 Secured registry session active.
+🔒 Secured cloud registry session active.
 
-© 2026 Webbo Technology Travel ERP Framework. All rights reserved. Managed Locally.
+© 2026 Webbo Technology Travel ERP Framework. All rights reserved. Cloud Hosted.
+const API_BASE_URL = "https://webbo-travel-erp-backend.onrender.com";
 let currentAgentId = 1;
 async function loadAgentData(id) {
 currentAgentId = id;
@@ -182,7 +183,7 @@ btn2.className = "px-4 py-2.5 bg-white text-emerald-800 rounded-lg text-xs md:te
 btn1.className = "px-4 py-2.5 text-slate-600 rounded-lg text-xs md:text-sm font-semibold hover:text-slate-900 transition-all duration-200 tracking-wide";
 }
 try {
-const res = await fetch(http://localhost:5000/api/payroll/${id});
+const res = await fetch(${API_BASE_URL}/api/payroll/${id});
 const data = await res.json();
 if(data && !data.error) {
 document.getElementById('agentName').innerText = data.name;
@@ -196,7 +197,7 @@ document.getElementById('tableComm').innerText = '+ BDT ' + data.commissionEarne
 document.getElementById('tableNet').innerText = 'BDT ' + data.netPayout.toLocaleString('en-IN', {minimumFractionDigits: 2});
 }
 } catch (err) {
-console.error("Connection data fetch failure:", err);
+console.error("Cloud fetch failure:", err);
 }
 }
 async function submitVisa(e) {
@@ -212,18 +213,18 @@ supplierCost: parseFloat(document.getElementById('visaCost').value),
 sellingPrice: parseFloat(document.getElementById('visaPrice').value)
 };
 try {
-const res = await fetch('http://localhost:5000/api/visa/submit', {
+const res = await fetch(${API_BASE_URL}/api/visa/submit, {
 method: 'POST',
 headers: { 'Content-Type': 'application/json' },
 body: JSON.stringify(payload)
 });
 const result = await res.json();
 if(result && result.success) {
-alert("💾 Visa record saved successfully to local database!");
+alert("💾 Visa record saved successfully to Neon Cloud Database!");
 loadAgentData(currentAgentId);
 }
 } catch (err) {
-alert("Database transmission layer sync timed out.");
+alert("Cloud transmission timed out. Wait 30 seconds if Render is waking up from sleep.");
 } finally {
 btn.disabled = false;
 }
@@ -242,21 +243,20 @@ supplierCost: parseFloat(document.getElementById('ticketCost').value),
 sellingPrice: parseFloat(document.getElementById('ticketPrice').value)
 };
 try {
-const res = await fetch('http://localhost:5000/api/ticket/submit', {
+const res = await fetch(${API_BASE_URL}/api/ticket/submit, {
 method: 'POST',
 headers: { 'Content-Type': 'application/json' },
 body: JSON.stringify(payload)
 });
 const result = await res.json();
 if(result && result.success) {
-alert("💾 Ticket PNR logged successfully into database!");
+alert("💾 Ticket PNR logged successfully to Neon Cloud Database!");
 loadAgentData(currentAgentId);
 }
 } catch (err) {
-alert("Database transmission layer sync timed out.");
+alert("Cloud transmission timed out. Wait 30 seconds if Render is waking up from sleep.");
 } finally {
 btn.disabled = false;
 }
 }
-// Boot system data loop initialization
 loadAgentData(1);
