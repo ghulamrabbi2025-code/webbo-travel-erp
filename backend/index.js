@@ -170,6 +170,65 @@ app.put('/api/hotel/update/:id', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// 10. Fetch All Visa Bookings
+app.get('/api/visas', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT v.*, c.name as customer_name 
+      FROM visa_bookings v
+      LEFT JOIN customers c ON v.customer_id = c.customer_id
+      ORDER BY v.visa_booking_id DESC
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 11. Edit / Update Existing Visa Booking
+app.put('/api/visa/update/:id', async (req, res) => {
+  const { id } = req.params;
+  const { country, visaType, trackingStatus, supplierCost, sellingPrice } = req.body;
+  try {
+    await pool.query(
+      `UPDATE visa_bookings SET country = $1, visa_type = $2, tracking_status = $3, supplier_cost = $4, selling_price = $5 WHERE visa_booking_id = $6`,
+      [country, visaType, trackingStatus, parseFloat(supplierCost), parseFloat(sellingPrice), parseInt(id, 10)]
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 12. Fetch All Flight Tickets
+app.get('/api/tickets', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT t.*, c.name as customer_name 
+      FROM flight_tickets t
+      LEFT JOIN customers c ON t.customer_id = c.customer_id
+      ORDER BY t.ticket_id DESC
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 13. Edit / Update Existing Flight Ticket
+app.put('/api/ticket/update/:id', async (req, res) => {
+  const { id } = req.params;
+  const { gdsPnr, airlineCode, route, supplierCost, sellingPrice } = req.body;
+  try {
+    await pool.query(
+      `UPDATE flight_tickets SET gds_pnr = $1, airline_code = $2, route = $3, supplier_cost = $4, selling_price = $5 WHERE ticket_id = $6`,
+      [gdsPnr.toUpperCase(), airlineCode.toUpperCase(), route.toUpperCase(), parseFloat(supplierCost), parseFloat(sellingPrice), parseInt(id, 10)]
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Cloud ERP Backend running on Port ${PORT}`));
