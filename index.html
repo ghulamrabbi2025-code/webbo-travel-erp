@@ -139,8 +139,6 @@
             <!-- COLUMN 2: AIR TICKETING FORM -->
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 space-y-4">
                 <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
-✈️
-
 Log Flight Ticket PNR
 Record PNR values from GDS stream.
 
@@ -185,7 +183,7 @@ btn1.className = "px-4 py-2.5 text-slate-600 rounded-lg text-xs md:text-sm font-
 try {
 const res = await fetch(${API_BASE_URL}/api/payroll/${id});
 const data = await res.json();
-if(data && !data.error) {
+if (data && !data.error) {
 document.getElementById('agentName').innerText = data.name;
 document.getElementById('agentRole').innerText = data.role;
 document.getElementById('salesMargin').innerText = 'BDT ' + data.salesMarginGenerated.toLocaleString('en-IN', {minimumFractionDigits: 2});
@@ -219,7 +217,7 @@ headers: { 'Content-Type': 'application/json' },
 body: JSON.stringify(payload)
 });
 const result = await res.json();
-if(result && result.success) {
+if (result && result.success) {
 alert("💾 Visa record saved successfully to Neon Cloud Database!");
 loadAgentData(currentAgentId);
 }
@@ -249,7 +247,7 @@ headers: { 'Content-Type': 'application/json' },
 body: JSON.stringify(payload)
 });
 const result = await res.json();
-if(result && result.success) {
+if (result && result.success) {
 alert("💾 Ticket PNR logged successfully to Neon Cloud Database!");
 loadAgentData(currentAgentId);
 }
