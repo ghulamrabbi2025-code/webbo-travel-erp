@@ -175,6 +175,67 @@
                 <div class="p-3 bg-slate-50 border-t text-[10px] text-slate-400 text-center font-semibold">🔒 Secured cloud registry session active.</div>
             </div>
         </div>
+        <!-- Customer & Passport Registry Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-2">
+            
+            <!-- Register Customer Form -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 space-y-4">
+                <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
+                    <span class="text-xl">🛂</span>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm md:text-base">Register Client & Passport</h3>
+                        <p class="text-[10px] text-slate-400 font-medium">Create traveler profile and generate Customer ID.</p>
+                    </div>
+                </div>
+                <form id="customerForm" class="space-y-3 text-xs font-semibold" onsubmit="submitCustomer(event)">
+                    <input type="text" id="custName" required placeholder="Full Name (as per Passport)" class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="text" id="custPhone" required placeholder="Mobile (+8801...)" class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                        <input type="text" id="custCompany" placeholder="Company / Group" class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[9px] uppercase font-bold text-slate-400 mb-0.5">Passport Number</label>
+                            <input type="text" id="custPassport" required placeholder="A01234567" class="w-full p-2.5 bg-slate-50 border rounded-xl uppercase font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-[9px] uppercase font-bold text-slate-400 mb-0.5">Expiry Date</label>
+                            <input type="date" id="custExpiry" required class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold p-3 rounded-xl shadow-md">➕ Register Traveler</button>
+                </form>
+            </div>
+
+            <!-- Live Customer & Passport Directory Table -->
+            <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden flex flex-col justify-between">
+                <div>
+                    <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                        <h3 class="font-bold text-slate-800 text-sm md:text-base">🗂️ Registered Clients & Passports</h3>
+                        <span class="bg-emerald-50 text-emerald-700 text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase">Live Directory</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-slate-50 text-slate-400 font-bold text-[9px] uppercase border-b">
+                                    <th class="p-3">ID</th>
+                                    <th class="p-3">Client Name</th>
+                                    <th class="p-3">Mobile</th>
+                                    <th class="p-3">Passport No.</th>
+                                    <th class="p-3">Expiry Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customerTableBody" class="text-slate-700 divide-y divide-slate-100 font-medium">
+                                <tr><td colspan="5" class="p-4 text-center text-slate-400">Loading directory...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="p-3 bg-slate-50 border-t text-[10px] text-slate-400 text-center font-semibold">Use the ID number above when logging Visas or Flight Tickets.</div>
+            </div>
+
+        </div>
+
     </main>
     <footer class="text-center py-6 text-xs text-slate-400 border-t bg-white mt-12">&copy; 2026 Webbo Technology Travel ERP Framework.</footer>
     <script src="app.js"></script>
