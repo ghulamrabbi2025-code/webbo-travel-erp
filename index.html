@@ -136,34 +136,47 @@
                 </form>
             </div>
 
-            <!-- COLUMN 2: AIR TICKETING FORM -->
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 space-y-4">
                 <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
-Log Flight Ticket PNR
-Record PNR values from GDS stream.
-
-Customer Database ID
-GDS PNR Code
-Airline Code
-Flight Routing Path
-Net Cost (BDT)
-Selling Price (BDT)
-💾 Log Ticket PNR
-
-
-📊
-Live Pay Sheet Summary
-
-Audited
-
-Salary Registry Component	Amount (BDT)
-Guaranteed Office Base Pay
-	BDT 0.00
-Travel Booking Margins Commission Share
-	• BDT 0.00
-Total Net Payout
-	BDT 0.00
-
-🔒 Secured cloud registry session active.
-
-© 2026 Webbo Technology Travel ERP Framework. All rights reserved. Cloud Hosted.
+                    <span class="text-xl">✈️</span>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm md:text-base">Log Flight Ticket PNR</h3>
+                        <p class="text-[10px] text-slate-400 font-medium">Record PNR values from GDS stream.</p>
+                    </div>
+                </div>
+                <form id="ticketForm" class="space-y-3 text-xs font-semibold" onsubmit="submitTicket(event)">
+                    <input type="number" id="ticketCustId" required value="1" placeholder="Customer ID" class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="text" id="gdsPnr" required value="PNR99XYZ" placeholder="GDS PNR" class="w-full p-2.5 bg-slate-50 border rounded-xl uppercase">
+                        <input type="text" id="airlineCode" required value="BG" placeholder="Airline" class="w-full p-2.5 bg-slate-50 border rounded-xl uppercase">
+                    </div>
+                    <input type="text" id="route" required value="DAC-DXB-LHR" placeholder="Route" class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="number" id="ticketCost" required value="85000" placeholder="Net Cost" class="w-full p-2.5 bg-slate-50 border rounded-xl text-red-600 font-bold">
+                        <input type="number" id="ticketPrice" required value="92000" placeholder="Selling Price" class="w-full p-2.5 bg-slate-50 border rounded-xl text-emerald-600 font-bold">
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded-xl shadow-md">💾 Log Ticket PNR</button>
+                </form>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden flex flex-col justify-between">
+                <div>
+                    <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                        <h3 class="font-bold text-slate-800 text-sm md:text-base">📊 Live Pay Sheet Summary</h3>
+                        <span class="bg-blue-50 text-blue-700 text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase">Audited</span>
+                    </div>
+                    <table class="w-full text-left border-collapse text-xs">
+                        <tbody class="text-slate-700 divide-y divide-slate-100 font-medium">
+                            <tr><td class="p-3 text-slate-500">Guaranteed Office Base Pay</td><td id="tableBase" class="p-3 text-right font-bold text-slate-900">BDT 0.00</td></tr>
+                            <tr><td class="p-3 text-amber-600">Commission Share</td><td id="tableComm" class="p-3 text-right font-bold text-amber-600">+ BDT 0.00</td></tr>
+                            <tr class="bg-emerald-50/40 font-bold"><td class="p-3 text-sm text-emerald-800">Total Net Payout</td><td id="tableNet" class="p-3 text-right text-sm font-black text-emerald-700">BDT 0.00</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="p-3 bg-slate-50 border-t text-[10px] text-slate-400 text-center font-semibold">🔒 Secured cloud registry session active.</div>
+            </div>
+        </div>
+    </main>
+    <footer class="text-center py-6 text-xs text-slate-400 border-t bg-white mt-12">&copy; 2026 Webbo Technology Travel ERP Framework.</footer>
+    <script src="app.js"></script>
+</body>
+</html>
