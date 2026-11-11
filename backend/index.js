@@ -19,12 +19,12 @@ app.get('/api/payroll/:employeeId', async (req, res) => {
   try {
     const empRes = await pool.query('SELECT * FROM employees WHERE employee_id = $1', [parseInt(employeeId, 10)]);
     if (empRes.rows.length === 0) return res.status(404).json({ error: 'Employee not found' });
-   const employee = empRes.rows[0];
+    const employee = empRes.rows.at(0);
 
-const visaMargin = await pool.query('SELECT COALESCE(SUM(margin_earned), 0) as sum FROM visa_bookings WHERE employee_id = $1', [parseInt(employeeId, 10)]);
-const flightMargin = await pool.query('SELECT COALESCE(SUM(margin_earned), 0) as sum FROM flight_tickets WHERE employee_id = $1', [parseInt(employeeId, 10)]);
+    const visaMargin = await pool.query('SELECT COALESCE(SUM(margin_earned), 0) as sum FROM visa_bookings WHERE employee_id = $1', [parseInt(employeeId, 10)]);
+    const flightMargin = await pool.query('SELECT COALESCE(SUM(margin_earned), 0) as sum FROM flight_tickets WHERE employee_id = $1', [parseInt(employeeId, 10)]);
 
-const totalSalesMargin = parseFloat(visaMargin.rows[0].sum) + parseFloat(flightMargin.rows[0].sum);
+    const totalSalesMargin = parseFloat(visaMargin.rows.at(0).sum) + parseFloat(flightMargin.rows.at(0).sum);
     const commissionEarned = totalSalesMargin * (parseFloat(employee.commission_rate) / 100);
     const netPayout = parseFloat(employee.base_salary) + commissionEarned;
 
@@ -38,7 +38,7 @@ const totalSalesMargin = parseFloat(visaMargin.rows[0].sum) + parseFloat(flightM
     });
   } catch (err) {
     console.error("Database error:", err.message);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -51,10 +51,10 @@ app.post('/api/visa/submit', async (req, res) => {
        VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
       [customerId, employeeId, country, visaType, parseFloat(supplierCost), parseFloat(sellingPrice)]
     );
-    res.status(201).json({ success: true, record: newVisa.rows[0] });
+    res.status(201).json({ success: true, record: newVisa.rows.at(0) });
   } catch (err) {
     console.error("Visa error:", err.message);
-    res.status(500).json({ error: "Failed to save visa record" });
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -67,12 +67,12 @@ app.post('/api/ticket/submit', async (req, res) => {
        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
       [customerId, employeeId, gdsPnr, airlineCode, route, parseFloat(supplierCost), parseFloat(sellingPrice)]
     );
-    res.status(201).json({ success: true, record: newTicket.rows[0] });
+    res.status(201).json({ success: true, record: newTicket.rows.at(0) });
   } catch (err) {
     console.error("Ticket error:", err.message);
-    res.status(500).json({ error: "Failed to save air ticket" });
+    res.status(500).json({ error: err.message });
   }
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Cloud ERP Backend running on Port ${PORT}`));
+app.listen(PORT, () => console.log(`Cloud ERP Backend running on Port ${PORT}`));
