@@ -13,6 +13,7 @@ const pool = new Pool({
   }
 });
 
+// 1. Fetch Payroll & Commissions
 app.get('/api/payroll/:employeeId', async (req, res) => {
   const { employeeId } = req.params;
   try {
@@ -41,6 +42,7 @@ app.get('/api/payroll/:employeeId', async (req, res) => {
   }
 });
 
+// 2. Submit Tourist / Umrah Visa
 app.post('/api/visa/submit', async (req, res) => {
   const { customerId, employeeId, country, visaType, supplierCost, sellingPrice } = req.body;
   try {
@@ -56,6 +58,7 @@ app.post('/api/visa/submit', async (req, res) => {
   }
 });
 
+// 3. Submit Air Ticket PNR
 app.post('/api/ticket/submit', async (req, res) => {
   const { customerId, employeeId, gdsPnr, airlineCode, route, supplierCost, sellingPrice } = req.body;
   try {
