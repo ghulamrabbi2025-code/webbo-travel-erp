@@ -224,6 +224,15 @@
                                     <th class="p-3">Passport No.</th>
                                     <th class="p-3">Expiry Date</th>
                                 </tr>
+                             <tr class="bg-slate-50 text-slate-400 font-bold text-[9px] uppercase border-b">
+                                 <th class="p-3">ID</th>
+                                 <th class="p-3">Client Name</th>
+                                 <th class="p-3">Mobile</th>
+                                 <th class="p-3">Passport No.</th>
+                                 <th class="p-3">Expiry Date</th>
+                                 <th class="p-3 text-right">Action</th>
+                             </tr>
+
                             </thead>
                             <tbody id="customerTableBody" class="text-slate-700 divide-y divide-slate-100 font-medium">
                                 <tr><td colspan="5" class="p-4 text-center text-slate-400">Loading directory...</td></tr>
@@ -232,6 +241,71 @@
                     </div>
                 </div>
                 <div class="p-3 bg-slate-50 border-t text-[10px] text-slate-400 text-center font-semibold">Use the ID number above when logging Visas or Flight Tickets.</div>
+            </div>
+
+        </div>
+        <!-- Worldwide Hotel Booking & Live Ledger Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-2">
+            
+            <!-- Hotel Booking Form -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 space-y-4">
+                <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
+                    <span class="text-xl">🏨</span>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm md:text-base">Worldwide Hotel Booking</h3>
+                        <p class="text-[10px] text-slate-400 font-medium">Log hotels in any city or country globally.</p>
+                    </div>
+                </div>
+                <form id="hotelForm" class="space-y-3 text-xs font-semibold" onsubmit="submitHotel(event)">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="number" id="hotelCustId" required value="1" placeholder="Customer ID" class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                        <input type="text" id="hotelCity" required placeholder="City / Country (e.g. Dubai)" class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                    </div>
+                    <input type="text" id="hotelName" required placeholder="Hotel Name" class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                    <input type="text" id="hotelRoom" required placeholder="Room Type (e.g. Deluxe Double)" class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[9px] uppercase font-bold text-slate-400 mb-0.5">Check-In</label>
+                            <input type="date" id="hotelCheckIn" required class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                        </div>
+                        <div>
+                            <label class="block text-[9px] uppercase font-bold text-slate-400 mb-0.5">Check-Out</label>
+                            <input type="date" id="hotelCheckOut" required class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="number" id="hotelCost" required placeholder="Net Cost (BDT)" class="w-full p-2.5 bg-slate-50 border rounded-xl text-red-600 font-bold">
+                        <input type="number" id="hotelPrice" required placeholder="Selling Price (BDT)" class="w-full p-2.5 bg-slate-50 border rounded-xl text-emerald-600 font-bold">
+                    </div>
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold p-3 rounded-xl shadow-md">💾 Save Hotel Booking</button>
+                </form>
+            </div>
+
+            <!-- Live Hotel Ledger Table with Edit Buttons -->
+            <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden flex flex-col justify-between">
+                <div>
+                    <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                        <h3 class="font-bold text-slate-800 text-sm md:text-base">🌍 Global Hotel Bookings Ledger</h3>
+                        <span class="bg-indigo-50 text-indigo-700 text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase">Editable Records</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-slate-50 text-slate-400 font-bold text-[9px] uppercase border-b">
+                                    <th class="p-3">City & Hotel</th>
+                                    <th class="p-3">Client</th>
+                                    <th class="p-3">Dates</th>
+                                    <th class="p-3">Profit (BDT)</th>
+                                    <th class="p-3 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="hotelTableBody" class="text-slate-700 divide-y divide-slate-100 font-medium">
+                                <tr><td colspan="5" class="p-4 text-center text-slate-400">Loading hotel bookings...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="p-3 bg-slate-50 border-t text-[10px] text-slate-400 text-center font-semibold">Click "Edit" on any row to modify destination, hotel, or BDT pricing.</div>
             </div>
 
         </div>
