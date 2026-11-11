@@ -101,5 +101,69 @@ async function submitTicket(e) {
         btn.disabled = false;
     }
 }
+async function loadCustomers() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/customers`);
+        const customers = await res.json();
+        const tbody = document.getElementById('customerTableBody');
+        if (!tbody) return;
+
+        if (customers.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-400">No clients registered yet.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = customers.map(c => {
+            const expiry = c.expiry_date ? new Date(c.expiry_date).toLocaleDateString('en-GB') : 'N/A';
+            return `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-3 font-bold text-emerald-700">#${c.customer_id}</td>
+                    <td class="p-3 font-semibold text-slate-800">${c.name}</td>
+                    <td class="p-3 text-slate-500">${c.phone}</td>
+                    <td class="p-3 font-mono font-bold text-blue-700">${c.passport_number || 'Pending'}</td>
+                    <td class="p-3 text-slate-600">${expiry}</td>
+                </tr>
+            `;
+        }).join('');
+    } catch (err) {
+        console.error("Error loading customers:", err);
+    }
+}
+
+async function submitCustomer(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    btn.disabled = true;
+
+    const payload = {
+        name: document.getElementById('custName').value,
+        phone: document.getElementById('custPhone').value,
+        companyName: document.getElementById('custCompany').value,
+        passportNumber: document.getElementById('custPassport').value,
+        expiryDate: document.getElementById('custExpiry').value
+    };
+
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/customer/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+        if (result && result.success) {
+            alert(`✅ Registered ${result.customer.name} as Customer ID #${result.customer.customer_id}!`);
+            e.target.reset();
+            loadCustomers();
+        } else {
+            alert("Error: " + (result.error || "Could not register client."));
+        }
+    } catch (err) {
+        alert("Cloud connection timed out. Please try again.");
+    } finally {
+        btn.disabled = false;
+    }
+}
 
 loadAgentData(1);
+loadCustomers();
+
