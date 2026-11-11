@@ -74,5 +74,47 @@ app.post('/api/ticket/submit', async (req, res) => {
   }
 });
 
+// 4. Register New Customer & Passport
+app.post('/api/customer/register', async (req, res) => {
+  const { name, phone, email, companyName, passportNumber, expiryDate } = req.body;
+  try {
+    const custRes = await pool.query(
+      `INSERT INTO customers (name, phone, email, company_name) 
+       VALUES ($1, $2, $3, $4) RETURNING *`,
+      [name, phone, email || null, companyName || null]
+    );
+    const newCustomer = custRes.rows.at(0);
+
+    if (passportNumber && expiryDate) {
+      await pool.query(
+        `INSERT INTO passports (customer_id, passport_number, expiry_date) 
+         VALUES ($1, $2, $3)`,
+        [newCustomer.customer_id, passportNumber.toUpperCase(), expiryDate]
+      );
+    }
+
+    res.status(201).json({ success: true, customer: newCustomer });
+  } catch (err) {
+    console.error("Customer registration error:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 5. Fetch All Customers & Passports
+app.get('/api/customers', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT c.customer_id, c.name, c.phone, c.company_name, p.passport_number, p.expiry_date
+      FROM customers c
+      LEFT JOIN passports p ON c.customer_id = p.customer_id
+      ORDER BY c.customer_id DESC
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Fetch customers error:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Cloud ERP Backend running on Port ${PORT}`));
