@@ -291,6 +291,64 @@ app.post('/api/login', async (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 });
+// 18. Log New Office Expense
+app.post('/api/expense/submit', async (req, res) => {
+  const { category, description, amount, expenseDate, loggedBy } = req.body;
+  try {
+    const newExp = await pool.query(
+      `INSERT INTO office_expenses (category, description, amount, expense_date, logged_by) 
+       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      [category, description, parseFloat(amount), expenseDate, loggedBy]
+    );
+    res.status(201).json({ success: true, record: newExp.rows.at(0) });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 19. Fetch All Expenses
+app.get('/api/expenses', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM office_expenses ORDER BY expense_date DESC, expense_id DESC');
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 20. Edit / Update Existing Expense
+app.put('/api/expense/update/:id', async (req, res) => {
+  const { id } = req.params;
+  const { category, description, amount } = req.body;
+  try {
+    await pool.query(
+      'UPDATE office_expenses SET category = $1, description = $2, amount = $3 WHERE expense_id = $4',
+      [category, description, parseFloat(amount), parseInt(id, 10)]
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 21. Agency-Wide Profit & Loss Summary
+app.get('/api/pnl', async (req, res) => {
+  try {
+    const vSum = await pool.query('SELECT COALESCE(SUM(margin_earned), 0) as sum FROM visa_bookings');
+    const fSum = await pool.query('SELECT COALESCE(SUM(margin_earned), 0) as sum FROM flight_tickets');
+    const hSum = await pool.query('SELECT COALESCE(SUM(margin_earned), 0) as sum FROM hotel_bookings');
+    const pSum = await pool.query('SELECT COALESCE(SUM(margin_earned), 0) as sum FROM tour_packages');
+    const expSum = await pool.query('SELECT COALESCE(SUM(amount), 0) as sum FROM office_expenses');
+
+    const grossProfit = parseFloat(vSum.rows.at(0).sum) + parseFloat(fSum.rows.at(0).sum) + parseFloat(hSum.rows.at(0).sum) + parseFloat(pSum.rows.at(0).sum);
+    const totalExpenses = parseFloat(expSum.rows.at(0).sum);
+    const netProfit = grossProfit - totalExpenses;
+
+    res.json({ grossProfit, totalExpenses, netProfit });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Cloud ERP Backend running on Port ${PORT}`));
