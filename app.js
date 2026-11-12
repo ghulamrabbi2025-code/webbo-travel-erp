@@ -537,6 +537,107 @@ function printInvoice() {
     `);
     printWindow.document.close();
 }
+async function loadPnL() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/pnl`);
+        const data = await res.json();
+        if (data && data.grossProfit !== undefined) {
+            document.getElementById('pnlGross').innerText = 'BDT ' + data.grossProfit.toLocaleString('en-IN', { minimumFractionDigits: 2 });
+            document.getElementById('pnlExpenses').innerText = 'BDT ' + data.totalExpenses.toLocaleString('en-IN', { minimumFractionDigits: 2 });
+            document.getElementById('pnlNet').innerText = 'BDT ' + data.netProfit.toLocaleString('en-IN', { minimumFractionDigits: 2 });
+        }
+    } catch (err) {
+        console.error("Error loading P&L:", err);
+    }
+}
+
+async function loadExpenses() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/expenses`);
+        const expenses = await res.json();
+        const tbody = document.getElementById('expenseTableBody');
+        if (!tbody) return;
+
+        if (expenses.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-400">No office expenses recorded yet.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = expenses.map(e => {
+            const expDate = new Date(e.expense_date).toLocaleDateString('en-GB');
+            return `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-3"><div class="font-bold text-slate-800">${e.description}</div><div class="text-[10px] text-red-600 font-bold">${e.category}</div></td>
+                    <td class="p-3 text-slate-500">${expDate}</td>
+                    <td class="p-3 font-mono font-bold text-red-600">- BDT ${parseFloat(e.amount).toLocaleString()}</td>
+                    <td class="p-3 text-right">
+                        <button onclick="editExpense(${e.expense_id}, '${e.category}', '${e.description}', ${e.amount})" class="px-2.5 py-1 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg text-[11px] font-bold">✏️ Edit</button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    } catch (err) {
+        console.error("Error loading expenses:", err);
+    }
+}
+
+async function editExpense(id, oldCat, oldDesc, oldAmt) {
+    const category = prompt("Update Category:", oldCat);
+    if (!category) return;
+    const description = prompt("Update Description:", oldDesc);
+    if (!description) return;
+    const amount = prompt("Update Amount (BDT):", oldAmt);
+
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/expense/update/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ category, description, amount })
+        });
+        const result = await res.json();
+        if (result.success) {
+            alert("✅ Expense updated & P&L recalculated!");
+            loadExpenses();
+            loadPnL();
+        }
+    } catch (err) {
+        alert("Update failed: " + err.message);
+    }
+}
+
+async function submitExpense(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    btn.disabled = true;
+
+    const payload = {
+        category: document.getElementById('expCategory').value,
+        description: document.getElementById('expDesc').value,
+        amount: parseFloat(document.getElementById('expAmount').value),
+        expenseDate: document.getElementById('expDate').value,
+        loggedBy: currentAgentId
+    };
+
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/expense/submit`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+        if (result && result.success) {
+            alert("🧾 Office expense logged & Net Profit updated!");
+            e.target.reset();
+            loadExpenses();
+            loadPnL();
+        }
+    } catch (err) {
+        alert("Cloud connection timed out: " + err.message);
+    } finally {
+        btn.disabled = false;
+    }
+}
+
 function initProtectedDashboard(agentId) {
     document.getElementById('loginOverlay').classList.add('hidden');
     loadAgentData(agentId);
@@ -545,6 +646,8 @@ function initProtectedDashboard(agentId) {
     loadVisas();
     loadTickets();
     loadPackages();
+    loadExpenses();
+loadPnL();
 }
 
 async function handleLogin(e) {
