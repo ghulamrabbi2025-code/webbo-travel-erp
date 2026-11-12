@@ -537,9 +537,60 @@ function printInvoice() {
     `);
     printWindow.document.close();
 }
-loadAgentData(1);
-loadCustomers();
-loadHotels();
-loadVisas();
-loadTickets();
-loadPackages();
+function initProtectedDashboard(agentId) {
+    document.getElementById('loginOverlay').classList.add('hidden');
+    loadAgentData(agentId);
+    loadCustomers();
+    loadHotels();
+    loadVisas();
+    loadTickets();
+    loadPackages();
+}
+
+async function handleLogin(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    const errBox = document.getElementById('loginError');
+    btn.disabled = true;
+    btn.innerText = "Verifying Credentials...";
+    errBox.classList.add('hidden');
+
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (data.success && data.user) {
+            localStorage.setItem('webboStaffSession', JSON.stringify(data.user));
+            initProtectedDashboard(data.user.employee_id);
+        } else {
+            errBox.innerText = data.error || "Incorrect email or password.";
+            errBox.classList.remove('hidden');
+        }
+    } catch (err) {
+        errBox.innerText = "Server waking up from sleep. Wait 30 seconds and click Unlock again.";
+        errBox.classList.remove('hidden');
+    } finally {
+        btn.disabled = false;
+        btn.innerText = "🔐 Unlock ERP Workspace";
+    }
+}
+
+function logoutUser() {
+    localStorage.removeItem('webboStaffSession');
+    document.getElementById('loginOverlay').classList.remove('hidden');
+    document.getElementById('loginForm').reset();
+}
+
+// Check if staff member is already logged in
+const savedSession = localStorage.getItem('webboStaffSession');
+if (savedSession) {
+    const user = JSON.parse(savedSession);
+    initProtectedDashboard(user.employee_id || 1);
+}
