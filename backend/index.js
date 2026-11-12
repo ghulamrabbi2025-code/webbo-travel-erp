@@ -414,7 +414,6 @@ res.json({ success: true });
 res.status(500).json({ error: err.message });
 }
 });
-// Health check route for Render port scanner
 app.get('/', (req, res) => {
   res.status(200).send('Webbo Travel ERP Backend is Live!');
 });
