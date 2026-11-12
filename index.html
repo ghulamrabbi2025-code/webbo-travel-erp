@@ -164,6 +164,7 @@
                     </div>
 
                     <button type="submit" class="w-full mt-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold p-3 rounded-xl shadow-md transition-all text-xs tracking-wide">
+                        <input type="number" id="visaPaid" placeholder="Amount Paid Now (BDT) - Blank if full" class="w-full p-2.5 bg-emerald-50/50 border border-emerald-200 rounded-xl font-bold text-emerald-800">
                         💾 Save Visa Entry
                     </button>
                 </form>
@@ -188,6 +189,8 @@
                         <input type="number" id="ticketCost" required value="85000" placeholder="Net Cost" class="w-full p-2.5 bg-slate-50 border rounded-xl text-red-600 font-bold">
                         <input type="number" id="ticketPrice" required value="92000" placeholder="Selling Price" class="w-full p-2.5 bg-slate-50 border rounded-xl text-emerald-600 font-bold">
                     </div>
+                    <input type="number" id="ticketPaid" placeholder="Amount Paid Now (BDT) - Blank if full" class="w-full p-2.5 bg-blue-50/50 border border-blue-200 rounded-xl font-bold text-blue-800">
+
                     <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded-xl shadow-md">💾 Log Ticket PNR</button>
                 </form>
             </div>
@@ -303,6 +306,8 @@
                         <input type="number" id="hotelCost" required placeholder="Net Cost (BDT)" class="w-full p-2.5 bg-slate-50 border rounded-xl text-red-600 font-bold">
                         <input type="number" id="hotelPrice" required placeholder="Selling Price (BDT)" class="w-full p-2.5 bg-slate-50 border rounded-xl text-emerald-600 font-bold">
                     </div>
+                    <input type="number" id="hotelPaid" placeholder="Amount Paid Now (BDT) - Blank if full" class="w-full p-2.5 bg-indigo-50/50 border border-indigo-200 rounded-xl font-bold text-indigo-800">
+
                     <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold p-3 rounded-xl shadow-md">💾 Save Hotel Booking</button>
                 </form>
             </div>
@@ -430,6 +435,8 @@
                         <input type="number" id="pkgCost" required placeholder="Total Net Cost (BDT)" class="w-full p-2.5 bg-slate-50 border rounded-xl text-red-600 font-bold">
                         <input type="number" id="pkgPrice" required placeholder="Client Package Price (BDT)" class="w-full p-2.5 bg-slate-50 border rounded-xl text-emerald-600 font-bold">
                     </div>
+                    <input type="number" id="pkgPaid" placeholder="Amount Paid Now (BDT) - Blank if full" class="w-full p-2.5 bg-teal-50/50 border border-teal-200 rounded-xl font-bold text-teal-800">
+
                     <button type="submit" class="w-full bg-teal-700 hover:bg-teal-800 text-white font-bold p-3 rounded-xl shadow-md">📦 Save Tour / Umrah Package</button>
                 </form>
             </div>
@@ -504,12 +511,21 @@
                             <td id="invAmount" class="py-3 text-right font-mono font-bold text-slate-800 text-sm">BDT 0.00</td>
                         </tr>
                     </tbody>
-                    <tfoot>
-                        <tr class="border-t-2 border-slate-800 bg-emerald-50/50">
-                            <td class="p-3 font-extrabold text-slate-800 text-sm">Total Payable (BDT)</td>
-                            <td id="invTotal" class="p-3 text-right font-mono font-black text-emerald-700 text-base">BDT 0.00</td>
-                        </tr>
-                    </tfoot>
+         <tfoot>
+    <tr class="border-t border-slate-300">
+        <td class="p-2.5 font-bold text-slate-600 text-xs">Total Invoice Amount</td>
+        <td id="invTotal" class="p-2.5 text-right font-mono font-bold text-slate-800 text-sm">BDT 0.00</td>
+    </tr>
+    <tr>
+        <td class="p-2.5 font-bold text-emerald-700 text-xs">Amount Paid Received</td>
+        <td id="invPaid" class="p-2.5 text-right font-mono font-bold text-emerald-700 text-sm">BDT 0.00</td>
+    </tr>
+    <tr class="border-t-2 border-slate-800 bg-amber-50/60">
+        <td class="p-3 font-extrabold text-slate-900 text-sm">Remaining Balance Due</td>
+        <td id="invDue" class="p-3 text-right font-mono font-black text-red-600 text-base">BDT 0.00</td>
+    </tr>
+</tfoot>
+
                 </table>
 
                 <div class="text-[10px] text-slate-400 text-center border-t border-slate-100 pt-3">
