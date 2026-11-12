@@ -284,7 +284,116 @@ async function submitHotel(e) {
         btn.disabled = false;
     }
 }
+async function loadVisas() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/visas`);
+        const visas = await res.json();
+        const tbody = document.getElementById('visaTableBody');
+        if (!tbody) return;
+
+        if (visas.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-400">No visa bookings recorded yet.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = visas.map(v => `
+            <tr class="hover:bg-slate-50">
+                <td class="p-3"><div class="font-bold text-slate-800">${v.country}</div><div class="text-[10px] text-emerald-600 font-bold">${v.visa_type}</div></td>
+                <td class="p-3 text-slate-600">${v.customer_name || 'ID #' + v.customer_id}</td>
+                <td class="p-3"><span class="px-2 py-0.5 bg-amber-50 text-amber-700 rounded-full text-[10px] font-bold">${v.tracking_status || 'Submitted'}</span></td>
+                <td class="p-3 font-mono font-bold text-emerald-700">+ BDT ${parseFloat(v.margin_earned).toLocaleString()}</td>
+                <td class="p-3 text-right">
+                    <button onclick="editVisa(${v.visa_booking_id}, '${v.country}', '${v.visa_type}', '${v.tracking_status || 'Submitted'}', ${v.supplier_cost}, ${v.selling_price})" class="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg text-[11px] font-bold">✏️ Edit</button>
+                </td>
+            </tr>
+        `).join('');
+    } catch (err) {
+        console.error("Error loading visas:", err);
+    }
+}
+
+async function editVisa(id, oldCountry, oldType, oldStatus, oldCost, oldPrice) {
+    const country = prompt("Update Destination Country:", oldCountry);
+    if (!country) return;
+    const visaType = prompt("Update Visa Subcategory:", oldType);
+    if (!visaType) return;
+    const trackingStatus = prompt("Update Tracking Status (e.g. Submitted, Approved, Delivered):", oldStatus);
+    const supplierCost = prompt("Update Net Cost (BDT):", oldCost);
+    const sellingPrice = prompt("Update Selling Price (BDT):", oldPrice);
+
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/visa/update/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ country, visaType, trackingStatus, supplierCost, sellingPrice })
+        });
+        const result = await res.json();
+        if (result.success) {
+            alert("✅ Visa booking updated & commission recalculated!");
+            loadVisas();
+            loadAgentData(currentAgentId);
+        }
+    } catch (err) {
+        alert("Update failed: " + err.message);
+    }
+}
+
+async function loadTickets() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/tickets`);
+        const tickets = await res.json();
+        const tbody = document.getElementById('ticketTableBody');
+        if (!tbody) return;
+
+        if (tickets.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-400">No flight tickets logged yet.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = tickets.map(t => `
+            <tr class="hover:bg-slate-50">
+                <td class="p-3"><div class="font-mono font-bold text-blue-700">${t.gds_pnr}</div><div class="text-[10px] text-slate-500 font-bold">${t.route}</div></td>
+                <td class="p-3 text-slate-600">${t.customer_name || 'ID #' + t.customer_id}</td>
+                <td class="p-3 font-bold text-slate-700">${t.airline_code}</td>
+                <td class="p-3 font-mono font-bold text-emerald-700">+ BDT ${parseFloat(t.margin_earned).toLocaleString()}</td>
+                <td class="p-3 text-right">
+                    <button onclick="editTicket(${t.ticket_id}, '${t.gds_pnr}', '${t.airline_code}', '${t.route}', ${t.supplier_cost}, ${t.selling_price})" class="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-[11px] font-bold">✏️ Edit</button>
+                </td>
+            </tr>
+        `).join('');
+    } catch (err) {
+        console.error("Error loading tickets:", err);
+    }
+}
+
+async function editTicket(id, oldPnr, oldAirline, oldRoute, oldCost, oldPrice) {
+    const gdsPnr = prompt("Update GDS PNR Code:", oldPnr);
+    if (!gdsPnr) return;
+    const airlineCode = prompt("Update Airline Code (e.g. BG, EK):", oldAirline);
+    if (!airlineCode) return;
+    const route = prompt("Update Flight Route (e.g. DAC-DXB):", oldRoute);
+    const supplierCost = prompt("Update Net Cost (BDT):", oldCost);
+    const sellingPrice = prompt("Update Selling Price (BDT):", oldPrice);
+
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/ticket/update/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ gdsPnr, airlineCode, route, supplierCost, sellingPrice })
+        });
+        const result = await res.json();
+        if (result.success) {
+            alert("✅ Flight ticket updated & commission recalculated!");
+            loadTickets();
+            loadAgentData(currentAgentId);
+        }
+    } catch (err) {
+        alert("Update failed: " + err.message);
+    }
+}
 
 loadAgentData(1);
 loadCustomers();
 loadHotels();
+loadVisas();
+loadTickets();
