@@ -1,261 +1,261 @@
 const API_BASE_URL = "https://onrender.com";
 let currentAgentId = 1;
+let revenueChartInstance = null;
+let serviceChartInstance = null;
+
+function switchTab(tabId) {
+    document.querySelectorAll('.erp-tab-section').forEach(sec => sec.classList.add('hidden'));
+    const target = document.getElementById(tabId);
+    if (target) target.classList.remove('hidden');
+
+    document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+        btn.className = "nav-tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold text-emerald-100 hover:bg-white/10 transition-all text-left";
+    });
+    const activeBtn = document.getElementById('btn-' + tabId);
+    if (activeBtn) {
+        activeBtn.className = "nav-tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold bg-white text-emerald-950 shadow-md transition-all text-left";
+    }
+}
+
+async function loadDashboardStats() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/dashboard-stats`);
+        const d = await res.json();
+        if (!d || d.error) return;
+
+        const fmt = (n) => 'BDT ' + parseFloat(n).toLocaleString('en-IN', { minimumFractionDigits: 2 });
+
+        document.getElementById('kpiTotalSales').innerText = fmt(d.totalSales);
+        document.getElementById('kpiOpProfit').innerText = fmt(d.operatingProfit);
+        document.getElementById('kpiCustDue').innerText = fmt(d.customerDue);
+        document.getElementById('kpiLastMonthExp').innerText = fmt(d.last30DaysExpenses);
+
+        document.getElementById('statVisaCount').innerText = d.visas.count + ' Visas';
+        document.getElementById('statVisaAmt').innerText = fmt(d.visas.amount);
+
+        document.getElementById('statTicketCount').innerText = d.tickets.count + ' Tickets';
+        document.getElementById('statTicketAmt').innerText = fmt(d.tickets.amount);
+
+        document.getElementById('statHotelCount').innerText = d.hotels.count + ' Bookings';
+        document.getElementById('statHotelAmt').innerText = fmt(d.hotels.amount);
+
+        document.getElementById('statPkgCount').innerText = d.packages.count + ' Packages';
+        document.getElementById('statPkgAmt').innerText = fmt(d.packages.amount);
+
+        renderCharts(d);
+    } catch (err) {
+        console.error("Dashboard stats error:", err);
+    }
+}
+
+function renderCharts(d) {
+    if (typeof Chart === 'undefined') return;
+
+    const ctx1 = document.getElementById('revenueBarChart');
+    if (ctx1) {
+        if (revenueChartInstance) revenueChartInstance.destroy();
+        revenueChartInstance = new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: ['Visas', 'Air Tickets', 'Hotels', 'Tour Packages'],
+                datasets: [
+                    {
+                        label: 'Total Sales (BDT)',
+                        data: [d.visas.amount, d.tickets.amount, d.hotels.amount, d.packages.amount],
+                        backgroundColor: ['#10b981', '#3b82f6', '#6366f1', '#14b8a6'],
+                        borderRadius: 8
+                    },
+                    {
+                        label: 'Net Profit Margin (BDT)',
+                        data: [d.visas.profit, d.tickets.profit, d.hotels.profit, d.packages.profit],
+                        backgroundColor: ['#047857', '#1d4ed8', '#4338ca', '#0f766e'],
+                        borderRadius: 8
+                    }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    }
+
+    const ctx2 = document.getElementById('serviceDoughnutChart');
+    if (ctx2) {
+        if (serviceChartInstance) serviceChartInstance.destroy();
+        serviceChartInstance = new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+                labels: ['Visa Processing', 'Air Ticketing', 'Hotel Bookings', 'Tour & Umrah Packages'],
+                datasets: [{
+                    data: [d.visas.count || 0, d.tickets.count || 0, d.hotels.count || 0, d.packages.count || 0],
+                    backgroundColor: ['#10b981', '#3b82f6', '#6366f1', '#f59e0b'],
+                    borderWidth: 2
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    }
+}
 
 async function loadAgentData(id) {
     currentAgentId = id;
-    const btn1 = document.getElementById('btnAgent1');
-    const btn2 = document.getElementById('btnAgent2');
-    
-    if (btn1 && btn2) {
-        if (id === 1) {
-            btn1.className = "px-4 py-2.5 bg-white text-emerald-800 rounded-lg text-xs md:text-sm font-bold shadow-sm transition-all duration-200 tracking-wide";
-            btn2.className = "px-4 py-2.5 text-slate-600 rounded-lg text-xs md:text-sm font-semibold hover:text-slate-900 transition-all duration-200 tracking-wide";
-        } else {
-            btn2.className = "px-4 py-2.5 bg-white text-emerald-800 rounded-lg text-xs md:text-sm font-bold shadow-sm transition-all duration-200 tracking-wide";
-            btn1.className = "px-4 py-2.5 text-slate-600 rounded-lg text-xs md:text-sm font-semibold hover:text-slate-900 transition-all duration-200 tracking-wide";
-        }
-    }
-
     try {
         const res = await fetch(`${API_BASE_URL}/api/payroll/${id}`);
         const data = await res.json();
-        
         if (data && !data.error) {
             document.getElementById('agentName').innerText = data.name;
             document.getElementById('agentRole').innerText = data.role;
-            document.getElementById('salesMargin').innerText = 'BDT ' + data.salesMarginGenerated.toLocaleString('en-IN', {minimumFractionDigits: 2});
-            document.getElementById('cardBaseSalary').innerText = 'BDT ' + data.baseSalary.toLocaleString('en-IN', {minimumFractionDigits: 2});
-            document.getElementById('cardCommEarned').innerText = 'BDT ' + data.commissionEarned.toLocaleString('en-IN', {minimumFractionDigits: 2});
-            document.getElementById('netPayout').innerText = 'BDT ' + data.netPayout.toLocaleString('en-IN', {minimumFractionDigits: 2});
-            
-            document.getElementById('tableBase').innerText = 'BDT ' + data.baseSalary.toLocaleString('en-IN', {minimumFractionDigits: 2});
-            document.getElementById('tableComm').innerText = '+ BDT ' + data.commissionEarned.toLocaleString('en-IN', {minimumFractionDigits: 2});
-            document.getElementById('tableNet').innerText = 'BDT ' + data.netPayout.toLocaleString('en-IN', {minimumFractionDigits: 2});
+            document.getElementById('salesMargin').innerText = 'BDT ' + data.salesMarginGenerated.toLocaleString('en-IN', { minimumFractionDigits: 2 });
+            document.getElementById('cardBaseSalary').innerText = 'BDT ' + data.baseSalary.toLocaleString('en-IN', { minimumFractionDigits: 2 });
+            document.getElementById('cardCommEarned').innerText = 'BDT ' + data.commissionEarned.toLocaleString('en-IN', { minimumFractionDigits: 2 });
+            document.getElementById('netPayout').innerText = 'BDT ' + data.netPayout.toLocaleString('en-IN', { minimumFractionDigits: 2 });
         }
     } catch (err) {
-        console.error("Cloud fetch failure:", err);
+        console.error("Payroll fetch error:", err);
     }
+}
+
+async function loadEmployees() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/employees`);
+        const employees = await res.json();
+        const switcher = document.getElementById('staffSwitcherBar');
+        if (switcher && employees.length > 0) {
+            switcher.innerHTML = employees.map(emp => {
+                const isActive = emp.employee_id === currentAgentId;
+                const cls = isActive ? "px-3.5 py-2 bg-emerald-700 text-white rounded-lg text-xs font-bold shadow" : "px-3.5 py-2 bg-slate-100 text-slate-700 rounded-lg text-xs font-semibold hover:bg-slate-200";
+                return `<button onclick="switchAgent(${emp.employee_id})" class="${cls}">${emp.name} (ID: ${emp.employee_id})</button>`;
+            }).join('');
+        }
+
+        const tbody = document.getElementById('staffTableBody');
+        if (tbody) {
+            tbody.innerHTML = employees.map(emp => `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-3 font-bold text-slate-800">#${emp.employee_id} ${emp.name}</td>
+                    <td class="p-3"><div class="font-semibold text-slate-700">${emp.role}</div><div class="text-[10px] text-slate-400">${emp.email}</div></td>
+                    <td class="p-3 font-mono font-bold text-slate-700">BDT ${parseFloat(emp.base_salary).toLocaleString()}</td>
+                    <td class="p-3 font-bold text-emerald-700">${parseFloat(emp.commission_rate)}%</td>
+                    <td class="p-3 text-right">
+                        <button onclick="editEmployee(${emp.employee_id}, '${emp.name}', '${emp.role}', ${emp.base_salary}, ${emp.commission_rate})" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[11px] font-bold">✏️ Edit</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+    } catch (err) { console.error(err); }
+}
+
+function switchAgent(id) { loadAgentData(id); loadEmployees(); }
+
+async function submitEmployee(e) {
+    e.preventDefault();
+    const payload = {
+        name: document.getElementById('empName').value,
+        email: document.getElementById('empEmail').value,
+        password: document.getElementById('empPass').value,
+        role: document.getElementById('empRole').value,
+        baseSalary: document.getElementById('empSalary').value,
+        commissionRate: document.getElementById('empComm').value
+    };
+    const res = await fetch(`${API_BASE_URL}/api/employee/add`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    const r = await res.json();
+    if (r.success) { alert("✅ New staff hired!"); e.target.reset(); loadEmployees(); }
+}
+
+async function editEmployee(id, oldName, oldRole, oldSal, oldComm) {
+    const name = prompt("Staff Name:", oldName); if (!name) return;
+    const role = prompt("Job Title:", oldRole); if (!role) return;
+    const baseSalary = prompt("Base Salary (BDT):", oldSal);
+    const commissionRate = prompt("Commission %:", oldComm);
+    const newPassword = prompt("New Password (leave blank to keep current):", "");
+    const res = await fetch(`${API_BASE_URL}/api/employee/update/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, role, baseSalary, commissionRate, newPassword }) });
+    if ((await res.json()).success) { alert("✅ Staff updated!"); loadEmployees(); loadAgentData(currentAgentId); }
 }
 
 async function submitVisa(e) {
     e.preventDefault();
-    const btn = e.target.querySelector('button[type="submit"]');
-    btn.disabled = true;
-
     const payload = {
         customerId: parseInt(document.getElementById('visaCustId').value),
         employeeId: currentAgentId,
         country: document.getElementById('visaCountry').value,
         visaType: document.getElementById('visaType').value,
-        supplierCost: parseFloat(document.getElementById('visaCost').value),
-        sellingPrice: parseFloat(document.getElementById('visaPrice').value),
+        supplierCost: document.getElementById('visaCost').value,
+        sellingPrice: document.getElementById('visaPrice').value,
         amountPaid: document.getElementById('visaPaid').value
     };
-
-    try {
-        const res = await fetch(`${API_BASE_URL}/api/visa/submit`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-        const result = await res.json();
-        if (result && result.success) {
-            alert("💾 Visa record saved successfully!");
-            document.getElementById('visaPaid').value = '';
-            loadAgentData(currentAgentId);
-            loadVisas();
-            loadPnL();
-        }
-    } catch (err) {
-        alert("Cloud transmission timed out: " + err.message);
-    } finally {
-        btn.disabled = false;
-    }
+    const res = await fetch(`${API_BASE_URL}/api/visa/submit`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    if ((await res.json()).success) { alert("💾 Visa entry saved!"); document.getElementById('visaPaid').value = ''; refreshAll(); }
 }
 
-async function submitTicket(e) {
-    e.preventDefault();
-    const btn = e.target.querySelector('button[type="submit"]');
-    btn.disabled = true;
-
-    const payload = {
-        customerId: parseInt(document.getElementById('ticketCustId').value),
-        employeeId: currentAgentId,
-        gdsPnr: document.getElementById('gdsPnr').value,
-        airlineCode: document.getElementById('airlineCode').value,
-        route: document.getElementById('route').value,
-        supplierCost: parseFloat(document.getElementById('ticketCost').value),
-        sellingPrice: parseFloat(document.getElementById('ticketPrice').value),
-        amountPaid: document.getElementById('ticketPaid').value
-    };
-
-    try {
-        const res = await fetch(`${API_BASE_URL}/api/ticket/submit`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-        const result = await res.json();
-        if (result && result.success) {
-            alert("💾 Ticket PNR logged successfully!");
-            document.getElementById('ticketPaid').value = '';
-            loadAgentData(currentAgentId);
-            loadTickets();
-            loadPnL();
-        }
-    } catch (err) {
-        alert("Cloud transmission timed out: " + err.message);
-    } finally {
-        btn.disabled = false;
-    }
-}
-
-async function loadCustomers() {
-    try {
-        const res = await fetch(`${API_BASE_URL}/api/customers`);
-        const customers = await res.json();
-        const tbody = document.getElementById('customerTableBody');
-        if (!tbody) return;
-
-        if (customers.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400">No clients registered yet.</td></tr>';
-            return;
-        }
-
-        tbody.innerHTML = customers.map(c => {
-            const expiry = c.expiry_date ? new Date(c.expiry_date).toISOString().split('T')[0] : '';
-            const displayExpiry = c.expiry_date ? new Date(c.expiry_date).toLocaleDateString('en-GB') : 'N/A';
-            return `
-                <tr class="hover:bg-slate-50">
-                    <td class="p-3 font-bold text-emerald-700">#${c.customer_id}</td>
-                    <td class="p-3 font-semibold text-slate-800">${c.name}</td>
-                    <td class="p-3 text-slate-500">${c.phone}</td>
-                    <td class="p-3 font-mono font-bold text-blue-700">${c.passport_number || 'Pending'}</td>
-                    <td class="p-3 text-slate-600">${displayExpiry}</td>
-                    <td class="p-3 text-right">
-                        <button onclick="editCustomer(${c.customer_id}, '${c.name}', '${c.phone}', '${c.passport_number || ''}', '${expiry}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[11px] font-bold">✏️ Edit</button>
-                    </td>
-                </tr>
-            `;
-        }).join('');
-    } catch (err) {
-        console.error("Error loading customers:", err);
-    }
-}
-
-async function editCustomer(id, oldName, oldPhone, oldPass, oldExp) {
-    const name = prompt("Update Client Full Name:", oldName);
-    if (!name) return;
-    const phone = prompt("Update Mobile Number:", oldPhone);
-    if (!phone) return;
-    const passportNumber = prompt("Update Passport Number:", oldPass);
-    const expiryDate = prompt("Update Passport Expiry (YYYY-MM-DD):", oldExp);
-
-    try {
-        const res = await fetch(`${API_BASE_URL}/api/customer/update/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, phone, passportNumber, expiryDate })
-        });
-        const result = await res.json();
-        if (result.success) {
-            alert("✅ Client details updated!");
-            loadCustomers();
-        }
-    } catch (err) {
-        alert("Update failed: " + err.message);
-    }
-}
-
-async function submitCustomer(e) {
-    e.preventDefault();
-    const btn = e.target.querySelector('button[type="submit"]');
-    btn.disabled = true;
-
-    const payload = {
-        name: document.getElementById('custName').value,
-        phone: document.getElementById('custPhone').value,
-        companyName: document.getElementById('custCompany').value,
-        passportNumber: document.getElementById('custPassport').value,
-        expiryDate: document.getElementById('custExpiry').value
-    };
-
-    try {
-        const res = await fetch(`${API_BASE_URL}/api/customer/register`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-        const result = await res.json();
-        if (result && result.success) {
-            alert(`✅ Registered ${result.customer.name} as Customer ID #${result.customer.customer_id}!`);
-            e.target.reset();
-            loadCustomers();
-        }
-    } catch (err) {
-        alert("Cloud connection timed out: " + err.message);
-    } finally {
-        btn.disabled = false;
-    }
-}
-
-async function loadHotels() {
-    try {
-        const res = await fetch(`${API_BASE_URL}/api/hotels`);
-        const hotels = await res.json();
-        const tbody = document.getElementById('hotelTableBody');
-        if (!tbody) return;
-
-        if (hotels.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-400">No hotel bookings recorded yet.</td></tr>';
-            return;
-        }
-
-        tbody.innerHTML = hotels.map(h => {
-            const inDate = new Date(h.check_in).toLocaleDateString('en-GB');
-            const outDate = new Date(h.check_out).toLocaleDateString('en-GB');
-            const paid = h.amount_paid !== null ? parseFloat(h.amount_paid) : parseFloat(h.selling_price);
-            const due = parseFloat(h.selling_price) - paid;
-            const dueBadge = due > 0 ? `<span class="block text-[10px] font-bold text-red-600">Due: BDT ${due.toLocaleString()}</span>` : `<span class="block text-[10px] font-bold text-emerald-600">✓ Full Paid</span>`;
-const payBtn = due > 0 ? <button onclick="collectPayment('hotel', ${h.hotel_booking_id}, ${paid}, ${h.selling_price})" class="px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-lg text-[11px] font-bold">💵 Pay</button> : '';
+async function loadVisas() {
+    const res = await fetch(`${API_BASE_URL}/api/visas`);
+    const list = await res.json();
+    const tbody = document.getElementById('visaTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = list.length ? list.map(v => {
+        const paid = v.amount_paid !== null ? parseFloat(v.amount_paid) : parseFloat(v.selling_price);
+        const due = parseFloat(v.selling_price) - paid;
+        const badge = due > 0 ? <span class="block text-[10px] font-bold text-red-600">Due: BDT ${due.toLocaleString()}</span> : <span class="block text-[10px] font-bold text-emerald-600">✓ Full Paid</span>;
+const payBtn = due > 0 ? <button onclick="collectPayment('visa', ${v.visa_booking_id}, ${paid}, ${v.selling_price})" class="px-2 py-1 bg-amber-100 text-amber-800 rounded text-[11px] font-bold">💵 Pay</button> : '';
 return `
-${h.hotel_name}${h.city} • ${h.room_type}
-${h.customer_name || 'ID #' + h.customer_id}\({inDate} - \){outDate}• BDT \(parseFloat(h.margin_{e}arned).toLocaleString()\){dueBadge}
-${payBtn}`;
-}).join('');
-} catch (err) {
-console.error("Error loading hotels:", err);
+${v.country}${v.visa_type}
+${v.customer_name || 'ID #' + v.customer_id}
+• BDT \(parseFloat(v.margin_{e}arned).toLocaleString()\){badge}
+${payBtn}
+`;
+}).join('') : 'No visas logged yet.';
 }
+async function editVisa(id, c, t, s, cost, price) {
+const country = prompt("Country:", c); if (!country) return;
+const visaType = prompt("Visa Type:", t);
+const trackingStatus = prompt("Status:", s);
+const supplierCost = prompt("Net Cost (BDT):", cost);
+const sellingPrice = prompt("Selling Price (BDT):", price);
+const res = await fetch(${API_BASE_URL}/api/visa/update/${id}, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ country, visaType, trackingStatus, supplierCost, sellingPrice }) });
+if ((await res.json()).success) { alert("✅ Visa updated!"); refreshAll(); }
 }
-async function editHotel(id, oldCity, oldHotel, oldRoom, oldCost, oldPrice) {
-const city = prompt("Update Destination City/Country:", oldCity);
-if (!city) return;
-const hotelName = prompt("Update Hotel Name:", oldHotel);
-if (!hotelName) return;
-const roomType = prompt("Update Room Type:", oldRoom);
-const supplierCost = prompt("Update Net Cost (BDT):", oldCost);
-const sellingPrice = prompt("Update Selling Price (BDT):", oldPrice);
-try {
-const res = await fetch(${API_BASE_URL}/api/hotel/update/${id}, {
-method: 'PUT',
-headers: { 'Content-Type': 'application/json' },
-body: JSON.stringify({ city, hotelName, roomType, supplierCost, sellingPrice })
-});
-const result = await res.json();
-if (result.success) {
-alert("✅ Hotel booking updated & commission recalculated!");
-loadHotels();
-loadAgentData(currentAgentId);
-loadPnL();
+async function submitTicket(e) {
+e.preventDefault();
+const payload = {
+customerId: parseInt(document.getElementById('ticketCustId').value),
+employeeId: currentAgentId,
+gdsPnr: document.getElementById('gdsPnr').value,
+airlineCode: document.getElementById('airlineCode').value,
+route: document.getElementById('route').value,
+supplierCost: document.getElementById('ticketCost').value,
+sellingPrice: document.getElementById('ticketPrice').value,
+amountPaid: document.getElementById('ticketPaid').value
+};
+const res = await fetch(${API_BASE_URL}/api/ticket/submit, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+if ((await res.json()).success) { alert("✈️ Ticket PNR saved!"); document.getElementById('ticketPaid').value = ''; refreshAll(); }
 }
-} catch (err) {
-alert("Update failed: " + err.message);
+async function loadTickets() {
+const res = await fetch(${API_BASE_URL}/api/tickets);
+const list = await res.json();
+const tbody = document.getElementById('ticketTableBody');
+if (!tbody) return;
+tbody.innerHTML = list.length ? list.map(t => {
+const paid = t.amount_paid !== null ? parseFloat(t.amount_paid) : parseFloat(t.selling_price);
+const due = parseFloat(t.selling_price) - paid;
+const badge = due > 0 ? <span class="block text-[10px] font-bold text-red-600">Due: BDT ${due.toLocaleString()}</span> : <span class="block text-[10px] font-bold text-emerald-600">✓ Full Paid</span>;
+const payBtn = due > 0 ? <button onclick="collectPayment('ticket', ${t.ticket_id}, ${paid}, ${t.selling_price})" class="px-2 py-1 bg-amber-100 text-amber-800 rounded text-[11px] font-bold">💵 Pay</button> : '';
+return `
+${t.gds_pnr} (${t.airline_code})${t.route}
+${t.customer_name || 'ID #' + t.customer_id}
+• BDT \(parseFloat(t.margin_{e}arned).toLocaleString()\){badge}
+${payBtn}
+`;
+}).join('') : 'No tickets logged yet.';
 }
+async function editTicket(id, pnr, air, rt, cost, price) {
+const gdsPnr = prompt("GDS PNR:", pnr); if (!gdsPnr) return;
+const airlineCode = prompt("Airline:", air);
+const route = prompt("Route:", rt);
+const supplierCost = prompt("Net Cost (BDT):", cost);
+const sellingPrice = prompt("Selling Price (BDT):", price);
+const res = await fetch(${API_BASE_URL}/api/ticket/update/${id}, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ gdsPnr, airlineCode, route, supplierCost, sellingPrice }) });
+if ((await res.json()).success) { alert("✅ Ticket updated!"); refreshAll(); }
 }
 async function submitHotel(e) {
 e.preventDefault();
-const btn = e.target.querySelector('button[type="submit"]');
-btn.disabled = true;
 const payload = {
 customerId: parseInt(document.getElementById('hotelCustId').value),
 employeeId: currentAgentId,
@@ -264,396 +264,230 @@ hotelName: document.getElementById('hotelName').value,
 roomType: document.getElementById('hotelRoom').value,
 checkIn: document.getElementById('hotelCheckIn').value,
 checkOut: document.getElementById('hotelCheckOut').value,
-supplierCost: parseFloat(document.getElementById('hotelCost').value),
-sellingPrice: parseFloat(document.getElementById('hotelPrice').value),
+supplierCost: document.getElementById('hotelCost').value,
+sellingPrice: document.getElementById('hotelPrice').value,
 amountPaid: document.getElementById('hotelPaid').value
 };
-try {
-const res = await fetch(${API_BASE_URL}/api/hotel/submit, {
-method: 'POST',
-headers: { 'Content-Type': 'application/json' },
-body: JSON.stringify(payload)
-});
-const result = await res.json();
-if (result && result.success) {
-alert("🏨 Global Hotel Booking saved!");
-e.target.reset();
-loadHotels();
-loadAgentData(currentAgentId);
-loadPnL();
+const res = await fetch(${API_BASE_URL}/api/hotel/submit, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+if ((await res.json()).success) { alert("🏨 Hotel booking saved!"); e.target.reset(); refreshAll(); }
 }
-} catch (err) {
-alert("Cloud connection timed out: " + err.message);
-} finally {
-btn.disabled = false;
-}
-}
-async function loadVisas() {
-try {
-const res = await fetch(${API_BASE_URL}/api/visas);
-const visas = await res.json();
-const tbody = document.getElementById('visaTableBody');
+async function loadHotels() {
+const res = await fetch(${API_BASE_URL}/api/hotels);
+const list = await res.json();
+const tbody = document.getElementById('hotelTableBody');
 if (!tbody) return;
-if (visas.length === 0) {
-tbody.innerHTML = 'No visa bookings recorded yet.';
-return;
-}
-tbody.innerHTML = visas.map(v => {
-const paid = v.amount_paid !== null ? parseFloat(v.amount_paid) : parseFloat(v.selling_price);
-const due = parseFloat(v.selling_price) - paid;
-const dueBadge = due > 0 ? <span class="block text-[10px] font-bold text-red-600">Due: BDT ${due.toLocaleString()}</span> : <span class="block text-[10px] font-bold text-emerald-600">✓ Full Paid</span>;
-const payBtn = due > 0 ? <button onclick="collectPayment('visa', ${v.visa_booking_id}, ${paid}, ${v.selling_price})" class="px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-lg text-[11px] font-bold">💵 Pay</button> : '';
+tbody.innerHTML = list.length ? list.map(h => {
+const inD = new Date(h.check_in).toLocaleDateString('en-GB');
+const outD = new Date(h.check_out).toLocaleDateString('en-GB');
+const paid = h.amount_paid !== null ? parseFloat(h.amount_paid) : parseFloat(h.selling_price);
+const due = parseFloat(h.selling_price) - paid;
+const badge = due > 0 ? <span class="block text-[10px] font-bold text-red-600">Due: BDT ${due.toLocaleString()}</span> : <span class="block text-[10px] font-bold text-emerald-600">✓ Full Paid</span>;
+const payBtn = due > 0 ? <button onclick="collectPayment('hotel', ${h.hotel_booking_id}, ${paid}, ${h.selling_price})" class="px-2 py-1 bg-amber-100 text-amber-800 rounded text-[11px] font-bold">💵 Pay</button> : '';
 return `
-${v.country}${v.visa_type}
-${v.customer_name || 'ID #' + v.customer_id}${v.tracking_status || 'Submitted'}• BDT \(parseFloat(v.margin_{e}arned).toLocaleString()\){dueBadge}
-${payBtn}`;
-}).join('');
-} catch (err) {
-console.error("Error loading visas:", err);
+${h.hotel_name}${h.city} • ${inD} to ${outD}
+${h.customer_name || 'ID #' + h.customer_id}
+• BDT \(parseFloat(h.margin_{e}arned).toLocaleString()\){badge}
+${payBtn}
+`;
+}).join('') : 'No hotel bookings yet.';
 }
-}
-async function editVisa(id, oldCountry, oldType, oldStatus, oldCost, oldPrice) {
-const country = prompt("Update Destination Country:", oldCountry);
-if (!country) return;
-const visaType = prompt("Update Visa Subcategory:", oldType);
-if (!visaType) return;
-const trackingStatus = prompt("Update Tracking Status (e.g. Submitted, Approved, Delivered):", oldStatus);
-const supplierCost = prompt("Update Net Cost (BDT):", oldCost);
-const sellingPrice = prompt("Update Selling Price (BDT):", oldPrice);
-try {
-const res = await fetch(${API_BASE_URL}/api/visa/update/${id}, {
-method: 'PUT',
-headers: { 'Content-Type': 'application/json' },
-body: JSON.stringify({ country, visaType, trackingStatus, supplierCost, sellingPrice })
-});
-const result = await res.json();
-if (result.success) {
-alert("✅ Visa booking updated & commission recalculated!");
-loadVisas();
-loadAgentData(currentAgentId);
-loadPnL();
-}
-} catch (err) {
-alert("Update failed: " + err.message);
-}
-}
-async function loadTickets() {
-try {
-const res = await fetch(${API_BASE_URL}/api/tickets);
-const tickets = await res.json();
-const tbody = document.getElementById('ticketTableBody');
-if (!tbody) return;
-if (tickets.length === 0) {
-tbody.innerHTML = 'No flight tickets logged yet.';
-return;
-}
-tbody.innerHTML = tickets.map(t => {
-const paid = t.amount_paid !== null ? parseFloat(t.amount_paid) : parseFloat(t.selling_price);
-const due = parseFloat(t.selling_price) - paid;
-const dueBadge = due > 0 ? <span class="block text-[10px] font-bold text-red-600">Due: BDT ${due.toLocaleString()}</span> : <span class="block text-[10px] font-bold text-emerald-600">✓ Full Paid</span>;
-const payBtn = due > 0 ? <button onclick="collectPayment('ticket', ${t.ticket_id}, ${paid}, ${t.selling_price})" class="px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-lg text-[11px] font-bold">💵 Pay</button> : '';
-return `
-${t.gds_pnr}${t.route}
-${t.customer_name || 'ID #' + t.customer_id}${t.airline_code}• BDT \(parseFloat(t.margin_{e}arned).toLocaleString()\){dueBadge}
-${payBtn}`;
-}).join('');
-} catch (err) {
-console.error("Error loading tickets:", err);
-}
-}
-async function editTicket(id, oldPnr, oldAirline, oldRoute, oldCost, oldPrice) {
-const gdsPnr = prompt("Update GDS PNR Code:", oldPnr);
-if (!gdsPnr) return;
-const airlineCode = prompt("Update Airline Code (e.g. BG, EK):", oldAirline);
-if (!airlineCode) return;
-const route = prompt("Update Flight Route (e.g. DAC-DXB):", oldRoute);
-const supplierCost = prompt("Update Net Cost (BDT):", oldCost);
-const sellingPrice = prompt("Update Selling Price (BDT):", oldPrice);
-try {
-const res = await fetch(${API_BASE_URL}/api/ticket/update/${id}, {
-method: 'PUT',
-headers: { 'Content-Type': 'application/json' },
-body: JSON.stringify({ gdsPnr, airlineCode, route, supplierCost, sellingPrice })
-});
-const result = await res.json();
-if (result.success) {
-alert("✅ Flight ticket updated & commission recalculated!");
-loadTickets();
-loadAgentData(currentAgentId);
-loadPnL();
-}
-} catch (err) {
-alert("Update failed: " + err.message);
-}
-}
-async function loadPackages() {
-try {
-const res = await fetch(${API_BASE_URL}/api/packages);
-const packages = await res.json();
-const tbody = document.getElementById('packageTableBody');
-if (!tbody) return;
-if (packages.length === 0) {
-tbody.innerHTML = 'No tour or Hajj/Umrah packages created yet.';
-return;
-}
-tbody.innerHTML = packages.map(p => {
-const depDate = new Date(p.departure_date).toLocaleDateString('en-GB');
-const paid = p.amount_paid !== null ? parseFloat(p.amount_paid) : parseFloat(p.selling_price);
-const due = parseFloat(p.selling_price) - paid;
-const dueBadge = due > 0 ? <span class="block text-[10px] font-bold text-red-600">Due: BDT ${due.toLocaleString()}</span> : <span class="block text-[10px] font-bold text-emerald-600">✓ Full Paid</span>;
-const payBtn = due > 0 ? <button onclick="collectPayment('package', ${p.package_id}, ${paid}, ${p.selling_price})" class="px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-lg text-[11px] font-bold">💵 Pay</button> : '';
-return `
-${p.customer_name || 'ID #' + p.customer_id}\({p.travelers_count} Pax</span><br>\){depDate}• BDT \(parseFloat(p.margin_{e}arned).toLocaleString()\){dueBadge}
-${payBtn}`;
-}).join('');
-} catch (err) {
-console.error("Error loading packages:", err);
-}
-}
-async function editPackage(id, oldName, oldDest, oldPax, oldServices, oldCost, oldPrice) {
-const packageName = prompt("Update Package Title:", oldName);
-if (!packageName) return;
-const destination = prompt("Update Destination(s):", oldDest);
-const travelersCount = prompt("Update Total Travelers (Pax):", oldPax);
-const includedServices = prompt("Update Included Services:", oldServices);
-const supplierCost = prompt("Update Total Net Cost (BDT):", oldCost);
-const sellingPrice = prompt("Update Client Package Price (BDT):", oldPrice);
-try {
-const res = await fetch(${API_BASE_URL}/api/package/update/${id}, {
-method: 'PUT',
-headers: { 'Content-Type': 'application/json' },
-body: JSON.stringify({ packageName, destination, travelersCount, includedServices, supplierCost, sellingPrice })
-});
-const result = await res.json();
-if (result.success) {
-alert("✅ Package updated & commission recalculated!");
-loadPackages();
-loadAgentData(currentAgentId);
-loadPnL();
-}
-} catch (err) {
-alert("Update failed: " + err.message);
-}
+async function editHotel(id, c, h, r, cost, price) {
+const city = prompt("City:", c); if (!city) return;
+const hotelName = prompt("Hotel Name:", h);
+const roomType = prompt("Room Type:", r);
+const supplierCost = prompt("Net Cost (BDT):", cost);
+const sellingPrice = prompt("Selling Price (BDT):", price);
+const res = await fetch(${API_BASE_URL}/api/hotel/update/${id}, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ city, hotelName, roomType, supplierCost, sellingPrice }) });
+if ((await res.json()).success) { alert("✅ Hotel updated!"); refreshAll(); }
 }
 async function submitPackage(e) {
 e.preventDefault();
-const btn = e.target.querySelector('button[type="submit"]');
-btn.disabled = true;
 const payload = {
 customerId: parseInt(document.getElementById('pkgCustId').value),
 employeeId: currentAgentId,
 packageName: document.getElementById('pkgName').value,
 category: document.getElementById('pkgCategory').value,
 destination: document.getElementById('pkgDest').value,
-travelersCount: parseInt(document.getElementById('pkgPax').value),
+travelersCount: document.getElementById('pkgPax').value,
 departureDate: document.getElementById('pkgDate').value,
 includedServices: document.getElementById('pkgServices').value,
-supplierCost: parseFloat(document.getElementById('pkgCost').value),
-sellingPrice: parseFloat(document.getElementById('pkgPrice').value),
+supplierCost: document.getElementById('pkgCost').value,
+sellingPrice: document.getElementById('pkgPrice').value,
 amountPaid: document.getElementById('pkgPaid').value
 };
-try {
-const res = await fetch(${API_BASE_URL}/api/package/submit, {
-method: 'POST',
-headers: { 'Content-Type': 'application/json' },
-body: JSON.stringify(payload)
-});
-const result = await res.json();
-if (result && result.success) {
-alert("📦 Package saved & commission updated!");
-e.target.reset();
-loadPackages();
-loadAgentData(currentAgentId);
-loadPnL();
+const res = await fetch(${API_BASE_URL}/api/package/submit, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+if ((await res.json()).success) { alert("📦 Package saved!"); e.target.reset(); refreshAll(); }
 }
-} catch (err) {
-alert("Cloud connection timed out: " + err.message);
-} finally {
-btn.disabled = false;
+async function loadPackages() {
+const res = await fetch(${API_BASE_URL}/api/packages);
+const list = await res.json();
+const tbody = document.getElementById('packageTableBody');
+if (!tbody) return;
+tbody.innerHTML = list.length ? list.map(p => {
+const depD = new Date(p.departure_date).toLocaleDateString('en-GB');
+const paid = p.amount_paid !== null ? parseFloat(p.amount_paid) : parseFloat(p.selling_price);
+const due = parseFloat(p.selling_price) - paid;
+const badge = due > 0 ? <span class="block text-[10px] font-bold text-red-600">Due: BDT ${due.toLocaleString()}</span> : <span class="block text-[10px] font-bold text-emerald-600">✓ Full Paid</span>;
+const payBtn = due > 0 ? <button onclick="collectPayment('package', ${p.package_id}, ${paid}, ${p.selling_price})" class="px-2 py-1 bg-amber-100 text-amber-800 rounded text-[11px] font-bold">💵 Pay</button> : '';
+return `
+${p.package_name} (${p.travelers_count} Pax)${p.category} • ${depD}
+${p.customer_name || 'ID #' + p.customer_id}
+• BDT \(parseFloat(p.margin_{e}arned).toLocaleString()\){badge}
+${payBtn}
+`;
+}).join('') : 'No packages created yet.';
 }
+async function editPackage(id, n, d, pax, srv, cost, price) {
+const packageName = prompt("Package Title:", n); if (!packageName) return;
+const destination = prompt("Destination:", d);
+const travelersCount = prompt("Pax Count:", pax);
+const includedServices = prompt("Services:", srv);
+const supplierCost = prompt("Net Cost (BDT):", cost);
+const sellingPrice = prompt("Selling Price (BDT):", price);
+const res = await fetch(${API_BASE_URL}/api/package/update/${id}, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ packageName, destination, travelersCount, includedServices, supplierCost, sellingPrice }) });
+if ((await res.json()).success) { alert("✅ Package updated!"); refreshAll(); }
 }
-async function collectPayment(type, id, currentPaid, totalSelling) {
-const addAmount = prompt(Total Bill: BDT ${totalSelling}\nAlready Paid: BDT ${currentPaid}\nRemaining Due: BDT ${totalSelling - currentPaid}\n\nEnter new payment received (BDT):);
-if (!addAmount || isNaN(addAmount)) return;
-const newPaidAmount = parseFloat(currentPaid) + parseFloat(addAmount);
-try {
-const res = await fetch(${API_BASE_URL}/api/payment/collect, {
-method: 'PUT',
-headers: { 'Content-Type': 'application/json' },
-body: JSON.stringify({ type, id, newPaidAmount })
-});
-const result = await res.json();
-if (result.success) {
-alert(✅ Payment of BDT ${parseFloat(addAmount).toLocaleString()} recorded!);
-loadVisas();
-loadTickets();
-loadHotels();
-loadPackages();
+async function submitCustomer(e) {
+e.preventDefault();
+const payload = {
+name: document.getElementById('custName').value,
+phone: document.getElementById('custPhone').value,
+companyName: document.getElementById('custCompany').value,
+passportNumber: document.getElementById('custPassport').value,
+expiryDate: document.getElementById('custExpiry').value
+};
+const res = await fetch(${API_BASE_URL}/api/customer/register, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+const r = await res.json();
+if (r.success) { alert(✅ Client registered as ID #${r.customer.customer_id}); e.target.reset(); loadCustomers(); }
 }
-} catch (err) {
-alert("Payment update failed: " + err.message);
+async function loadCustomers() {
+const res = await fetch(${API_BASE_URL}/api/customers);
+const list = await res.json();
+const tbody = document.getElementById('customerTableBody');
+if (!tbody) return;
+tbody.innerHTML = list.map(c => {
+const expISO = c.expiry_date ? new Date(c.expiry_date).toISOString().split('T').at(0) : '';
+const expDisp = c.expiry_date ? new Date(c.expiry_date).toLocaleDateString('en-GB') : 'N/A';
+return `
+#${c.customer_id}
+${c.name}
+${c.phone}
+${c.passport_number || 'Pending'}
+${expDisp}
+✏️ Edit
+`;
+}).join('');
 }
+async function editCustomer(id, n, p, pass, exp) {
+const name = prompt("Client Name:", n); if (!name) return;
+const phone = prompt("Mobile:", p);
+const passportNumber = prompt("Passport No:", pass);
+const expiryDate = prompt("Expiry (YYYY-MM-DD):", exp);
+const res = await fetch(${API_BASE_URL}/api/customer/update/${id}, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, phone, passportNumber, expiryDate }) });
+if ((await res.json()).success) { alert("✅ Client updated!"); loadCustomers(); }
 }
-function openInvoice(invId, clientName, title, subDetails, sellingPrice, paidAmount) {
-const total = parseFloat(sellingPrice);
-const paid = paidAmount !== undefined && paidAmount !== null ? parseFloat(paidAmount) : total;
+async function submitExpense(e) {
+e.preventDefault();
+const payload = {
+category: document.getElementById('expCategory').value,
+description: document.getElementById('expDesc').value,
+amount: document.getElementById('expAmount').value,
+expenseDate: document.getElementById('expDate').value,
+loggedBy: currentAgentId
+};
+const res = await fetch(${API_BASE_URL}/api/expense/submit, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+if ((await res.json()).success) { alert("🧾 Expense logged!"); e.target.reset(); refreshAll(); }
+}
+async function loadExpenses() {
+const res = await fetch(${API_BASE_URL}/api/expenses);
+const list = await res.json();
+const tbody = document.getElementById('expenseTableBody');
+if (!tbody) return;
+tbody.innerHTML = list.length ? list.map(e => {
+const d = new Date(e.expense_date).toLocaleDateString('en-GB');
+return `
+${e.description}${e.category}
+${d}
+• BDT ${parseFloat(e.amount).toLocaleString()}
+✏️ Edit
+`;
+}).join('') : 'No expenses logged yet.';
+}
+async function editExpense(id, c, d, a) {
+const category = prompt("Category:", c); if (!category) return;
+const description = prompt("Description:", d);
+const amount = prompt("Amount (BDT):", a);
+const res = await fetch(${API_BASE_URL}/api/expense/update/${id}, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ category, description, amount }) });
+if ((await res.json()).success) { alert("✅ Expense updated!"); refreshAll(); }
+}
+async function collectPayment(type, id, currPaid, total) {
+const add = prompt(Total: BDT ${total}\nPaid: BDT ${currPaid}\nDue: BDT ${total - currPaid}\n\nEnter new payment received (BDT):);
+if (!add || isNaN(add)) return;
+const res = await fetch(${API_BASE_URL}/api/payment/collect, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type, id, newPaidAmount: parseFloat(currPaid) + parseFloat(add) }) });
+if ((await res.json()).success) { alert("✅ Payment collected!"); refreshAll(); }
+}
+function openInvoice(invId, client, title, sub, totalVal, paidVal) {
+const total = parseFloat(totalVal);
+const paid = paidVal !== undefined && paidVal !== null ? parseFloat(paidVal) : total;
 const due = Math.max(0, total - paid);
 document.getElementById('invNumber').innerText = 'INV-' + invId;
 document.getElementById('invDate').innerText = 'Date: ' + new Date().toLocaleDateString('en-GB');
-document.getElementById('invClient').innerText = clientName;
-document.getElementById('invAgent').innerText = document.getElementById('agentName')?.innerText || 'Travel Consultant';
+document.getElementById('invClient').innerText = client;
+document.getElementById('invAgent').innerText = document.getElementById('agentName')?.innerText || 'Consultant';
 document.getElementById('invServiceTitle').innerText = title;
-document.getElementById('invServiceSub').innerText = subDetails;
+document.getElementById('invServiceSub').innerText = sub;
 document.getElementById('invAmount').innerText = 'BDT ' + total.toLocaleString('en-IN', { minimumFractionDigits: 2 });
 document.getElementById('invTotal').innerText = 'BDT ' + total.toLocaleString('en-IN', { minimumFractionDigits: 2 });
 document.getElementById('invPaid').innerText = 'BDT ' + paid.toLocaleString('en-IN', { minimumFractionDigits: 2 });
 document.getElementById('invDue').innerText = 'BDT ' + due.toLocaleString('en-IN', { minimumFractionDigits: 2 });
 document.getElementById('invoiceModal').classList.remove('hidden');
 }
-function closeInvoice() {
-document.getElementById('invoiceModal').classList.add('hidden');
-}
+function closeInvoice() { document.getElementById('invoiceModal').classList.add('hidden'); }
 function printInvoice() {
-const receiptHTML = document.getElementById('printableReceipt').innerHTML;
-const printWindow = window.open('', '', 'width=700,height=800');
-printWindow.document.write(<html> <head> <title>Webbo Travel Receipt</title> <script src="https://tailwindcss.com"><\/script> </head> <body class="p-8 bg-white text-slate-800 font-sans"> <div class="max-w-lg mx-auto border border-slate-300 rounded-2xl p-6 space-y-6"> ${receiptHTML} </div> <script> setTimeout(() => { window.print(); window.close(); }, 500); <\/script> </body> </html>);
-printWindow.document.close();
+const html = document.getElementById('printableReceipt').innerHTML;
+const w = window.open('', '', 'width=720,height=820');
+w.document.write(<html><head><title>CM Travels & Tours Receipt</title><script src="https://tailwindcss.com"><\/script></head><body class="p-8 bg-white"><div class="max-w-lg mx-auto border border-slate-300 rounded-2xl p-6 space-y-5">${html}</div><script>setTimeout(()=>{window.print();window.close();},500);<\/script></body></html>);
+w.document.close();
 }
-async function loadPnL() {
-try {
-const res = await fetch(${API_BASE_URL}/api/pnl);
-const data = await res.json();
-if (data && data.grossProfit !== undefined) {
-document.getElementById('pnlGross').innerText = 'BDT ' + data.grossProfit.toLocaleString('en-IN', { minimumFractionDigits: 2 });
-document.getElementById('pnlExpenses').innerText = 'BDT ' + data.totalExpenses.toLocaleString('en-IN', { minimumFractionDigits: 2 });
-document.getElementById('pnlNet').innerText = 'BDT ' + data.netProfit.toLocaleString('en-IN', { minimumFractionDigits: 2 });
-}
-} catch (err) {
-console.error("Error loading P&L:", err);
-}
-}
-async function loadExpenses() {
-try {
-const res = await fetch(${API_BASE_URL}/api/expenses);
-const expenses = await res.json();
-const tbody = document.getElementById('expenseTableBody');
-if (!tbody) return;
-if (expenses.length === 0) {
-tbody.innerHTML = 'No office expenses recorded yet.';
-return;
-}
-tbody.innerHTML = expenses.map(e => {
-const expDate = new Date(e.expense_date).toLocaleDateString('en-GB');
-return `
-${e.description}${e.category}
-${expDate}• BDT ${parseFloat(e.amount).toLocaleString()}
-`;
-}).join('');
-} catch (err) {
-console.error("Error loading expenses:", err);
-}
-}
-async function editExpense(id, oldCat, oldDesc, oldAmt) {
-const category = prompt("Update Category:", oldCat);
-if (!category) return;
-const description = prompt("Update Description:", oldDesc);
-if (!description) return;
-const amount = prompt("Update Amount (BDT):", oldAmt);
-try {
-const res = await fetch(${API_BASE_URL}/api/expense/update/${id}, {
-method: 'PUT',
-headers: { 'Content-Type': 'application/json' },
-body: JSON.stringify({ category, description, amount })
-});
-const result = await res.json();
-if (result.success) {
-alert("✅ Expense updated & P&L recalculated!");
+function refreshAll() {
+loadDashboardStats();
+loadAgentData(currentAgentId);
+loadVisas();
+loadTickets();
+loadHotels();
+loadPackages();
 loadExpenses();
-loadPnL();
-}
-} catch (err) {
-alert("Update failed: " + err.message);
-}
-}
-async function submitExpense(e) {
-e.preventDefault();
-const btn = e.target.querySelector('button[type="submit"]');
-btn.disabled = true;
-const payload = {
-category: document.getElementById('expCategory').value,
-description: document.getElementById('expDesc').value,
-amount: parseFloat(document.getElementById('expAmount').value),
-expenseDate: document.getElementById('expDate').value,
-loggedBy: currentAgentId
-};
-try {
-const res = await fetch(${API_BASE_URL}/api/expense/submit, {
-method: 'POST',
-headers: { 'Content-Type': 'application/json' },
-body: JSON.stringify(payload)
-});
-const result = await res.json();
-if (result && result.success) {
-alert("🧾 Office expense logged & Net Profit updated!");
-e.target.reset();
-loadExpenses();
-loadPnL();
-}
-} catch (err) {
-alert("Cloud connection timed out: " + err.message);
-} finally {
-btn.disabled = false;
-}
 }
 function initProtectedDashboard(agentId) {
 document.getElementById('loginOverlay').classList.add('hidden');
-loadAgentData(agentId);
+currentAgentId = agentId;
+loadEmployees();
 loadCustomers();
-loadHotels();
-loadVisas();
-loadTickets();
-loadPackages();
-loadExpenses();
-loadPnL();
+refreshAll();
 }
 async function handleLogin(e) {
 e.preventDefault();
-const btn = e.target.querySelector('button[type="submit"]');
 const errBox = document.getElementById('loginError');
-btn.disabled = true;
-btn.innerText = "Verifying Credentials...";
 errBox.classList.add('hidden');
-const email = document.getElementById('loginEmail').value;
-const password = document.getElementById('loginPassword').value;
-try {
 const res = await fetch(${API_BASE_URL}/api/login, {
 method: 'POST',
 headers: { 'Content-Type': 'application/json' },
-body: JSON.stringify({ email, password })
+body: JSON.stringify({ email: document.getElementById('loginEmail').value, password: document.getElementById('loginPassword').value })
 });
 const data = await res.json();
 if (data.success && data.user) {
 localStorage.setItem('webboStaffSession', JSON.stringify(data.user));
 initProtectedDashboard(data.user.employee_id);
 } else {
-errBox.innerText = data.error || "Incorrect email or password.";
+errBox.innerText = data.error || "Invalid credentials";
 errBox.classList.remove('hidden');
-}
-} catch (err) {
-errBox.innerText = "Server waking up from sleep. Wait 30 seconds and click Unlock again.";
-errBox.classList.remove('hidden');
-} finally {
-btn.disabled = false;
-btn.innerText = "🔐 Unlock ERP Workspace";
 }
 }
 function logoutUser() {
 localStorage.removeItem('webboStaffSession');
 document.getElementById('loginOverlay').classList.remove('hidden');
-document.getElementById('loginForm').reset();
 }
 const savedSession = localStorage.getItem('webboStaffSession');
 if (savedSession) {
-const user = JSON.parse(savedSession);
-initProtectedDashboard(user.employee_id || 1);
+initProtectedDashboard(JSON.parse(savedSession).employee_id || 1);
 }
