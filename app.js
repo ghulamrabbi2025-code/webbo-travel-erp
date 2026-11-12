@@ -495,7 +495,48 @@ async function submitPackage(e) {
         btn.disabled = false;
     }
 }
+function openInvoice(invId, clientName, title, subDetails, sellingPrice) {
+    const formattedAmount = 'BDT ' + parseFloat(sellingPrice).toLocaleString('en-IN', { minimumFractionDigits: 2 });
+    const today = new Date().toLocaleDateString('en-GB');
+    const activeAgent = document.getElementById('agentName')?.innerText || 'Travel Consultant';
 
+    document.getElementById('invNumber').innerText = 'INV-' + invId;
+    document.getElementById('invDate').innerText = 'Date: ' + today;
+    document.getElementById('invClient').innerText = clientName;
+    document.getElementById('invAgent').innerText = activeAgent;
+    document.getElementById('invServiceTitle').innerText = title;
+    document.getElementById('invServiceSub').innerText = subDetails;
+    document.getElementById('invAmount').innerText = formattedAmount;
+    document.getElementById('invTotal').innerText = formattedAmount;
+
+    document.getElementById('invoiceModal').classList.remove('hidden');
+}
+
+function closeInvoice() {
+    document.getElementById('invoiceModal').classList.add('hidden');
+}
+
+function printInvoice() {
+    const receiptHTML = document.getElementById('printableReceipt').innerHTML;
+    const printWindow = window.open('', '', 'width=700,height=800');
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>Webbo Travel Receipt</title>
+            <script src="https://tailwindcss.com"><\/script>
+        </head>
+        <body class="p-8 bg-white text-slate-800 font-sans">
+            <div class="max-w-lg mx-auto border border-slate-300 rounded-2xl p-6 space-y-6">
+                ${receiptHTML}
+            </div>
+            <script>
+                setTimeout(() => { window.print(); window.close(); }, 500);
+            <\/script>
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+}
 loadAgentData(1);
 loadCustomers();
 loadHotels();
