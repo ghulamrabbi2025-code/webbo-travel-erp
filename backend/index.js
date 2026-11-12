@@ -22,8 +22,10 @@ app.get('/api/payroll/:employeeId', async (req, res) => {
     const visaMargin = await pool.query('SELECT COALESCE(SUM(margin_earned), 0) as sum FROM visa_bookings WHERE employee_id = $1', [parseInt(employeeId, 10)]);
     const flightMargin = await pool.query('SELECT COALESCE(SUM(margin_earned), 0) as sum FROM flight_tickets WHERE employee_id = $1', [parseInt(employeeId, 10)]);
     const hotelMargin = await pool.query('SELECT COALESCE(SUM(margin_earned), 0) as sum FROM hotel_bookings WHERE employee_id = $1', [parseInt(employeeId, 10)]);
+    const pkgMargin = await pool.query('SELECT COALESCE(SUM(margin_earned), 0) as sum FROM tour_packages WHERE employee_id = $1', [parseInt(employeeId, 10)]);
 
-    const totalSalesMargin = parseFloat(visaMargin.rows.at(0).sum) + parseFloat(flightMargin.rows.at(0).sum) + parseFloat(hotelMargin.rows.at(0).sum);
+    const totalSalesMargin = parseFloat(visaMargin.rows.at(0).sum) + parseFloat(flightMargin.rows.at(0).sum) + parseFloat(hotelMargin.rows.at(0).sum) + parseFloat(pkgMargin.rows.at(0).sum);
+
     const commissionEarned = totalSalesMargin * (parseFloat(employee.commission_rate) / 100);
     const netPayout = parseFloat(employee.base_salary) + commissionEarned;
 
