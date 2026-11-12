@@ -11,6 +11,35 @@
     </style>
 </head>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col">
+    <!-- Staff Login Lock Screen -->
+    <div id="loginOverlay" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-200 space-y-6">
+            <div class="text-center space-y-2">
+                <div class="inline-flex bg-emerald-100 text-emerald-800 p-3.5 rounded-2xl text-3xl shadow-inner">🕋</div>
+                <h2 class="text-2xl font-black text-slate-800 tracking-tight">Webbo Travel ERP</h2>
+                <p class="text-xs text-slate-500 font-medium">Authorized Staff & Management Portal Login</p>
+            </div>
+
+            <form id="loginForm" class="space-y-4 text-xs font-semibold" onsubmit="handleLogin(event)">
+                <div>
+                    <label class="block text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">Staff Email Address</label>
+                    <input type="email" id="loginEmail" required placeholder="mahbub@agency.com" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-emerald-600 focus:bg-white transition-all">
+                </div>
+                <div>
+                    <label class="block text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">Security Password</label>
+                    <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-emerald-600 focus:bg-white transition-all">
+                </div>
+                <p id="loginError" class="hidden text-red-600 bg-red-50 p-2.5 rounded-xl text-center font-bold"></p>
+                <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold p-3.5 rounded-xl shadow-lg transition-all text-sm tracking-wide">
+                    🔐 Unlock ERP Workspace
+                </button>
+            </form>
+
+            <div class="text-center text-[10px] text-slate-400 font-medium border-t border-slate-100 pt-4">
+                Protected Enterprise Session • Keraniganj & Dhaka Operations
+            </div>
+        </div>
+    </div>
 
     <!-- Navigation Bar -->
     <nav class="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 text-white shadow-xl px-4 py-4 sticky top-0 z-50 border-b border-emerald-900/20">
@@ -34,6 +63,10 @@
                 </span>
                 <div class="text-xs font-semibold bg-white/10 backdrop-blur-md px-3 py-2 rounded-xl border border-white/10 text-emerald-100 tracking-wide">
                     🟢 Cloud Live: Neon + Render Connected
+                                    <button onclick="logoutUser()" class="text-xs font-bold bg-red-500/20 hover:bg-red-500/40 text-white px-3 py-2 rounded-xl border border-red-400/30 transition-all">
+                    🚪 Logout
+                </button>
+
                 </div>
             </div>
         </div>
