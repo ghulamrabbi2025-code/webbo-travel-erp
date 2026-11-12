@@ -392,8 +392,107 @@ async function editTicket(id, oldPnr, oldAirline, oldRoute, oldCost, oldPrice) {
     }
 }
 
+async function loadPackages() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/packages`);
+        const packages = await res.json();
+        const tbody = document.getElementById('packageTableBody');
+        if (!tbody) return;
+
+        if (packages.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-400">No tour or Hajj/Umrah packages created yet.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = packages.map(p => {
+            const depDate = new Date(p.departure_date).toLocaleDateString('en-GB');
+            return `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-3">
+                        <div class="font-bold text-slate-800">${p.package_name} <span class="text-[10px] bg-teal-50 text-teal-700 px-1.5 py-0.5 rounded">${p.category}</span></div>
+                        <div class="text-[10px] text-slate-500 mt-0.5">${p.destination} • ${p.included_services}</div>
+                    </td>
+                    <td class="p-3 text-slate-600">${p.customer_name || 'ID #' + p.customer_id}</td>
+                    <td class="p-3 text-[11px] text-slate-600"><span class="font-bold">${p.travelers_count} Pax</span><br>${depDate}</td>
+                    <td class="p-3 font-mono font-bold text-emerald-700">+ BDT ${parseFloat(p.margin_earned).toLocaleString()}</td>
+                    <td class="p-3 text-right">
+                        <button onclick="editPackage(${p.package_id}, '${p.package_name}', '${p.destination}', ${p.travelers_count}, '${p.included_services}', ${p.supplier_cost}, ${p.selling_price})" class="px-2.5 py-1 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-lg text-[11px] font-bold">✏️ Edit</button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    } catch (err) {
+        console.error("Error loading packages:", err);
+    }
+}
+
+async function editPackage(id, oldName, oldDest, oldPax, oldServices, oldCost, oldPrice) {
+    const packageName = prompt("Update Package Title:", oldName);
+    if (!packageName) return;
+    const destination = prompt("Update Destination(s):", oldDest);
+    const travelersCount = prompt("Update Total Travelers (Pax):", oldPax);
+    const includedServices = prompt("Update Included Services:", oldServices);
+    const supplierCost = prompt("Update Total Net Cost (BDT):", oldCost);
+    const sellingPrice = prompt("Update Client Package Price (BDT):", oldPrice);
+
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/package/update/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ packageName, destination, travelersCount, includedServices, supplierCost, sellingPrice })
+        });
+        const result = await res.json();
+        if (result.success) {
+            alert("✅ Package updated & commission recalculated!");
+            loadPackages();
+            loadAgentData(currentAgentId);
+        }
+    } catch (err) {
+        alert("Update failed: " + err.message);
+    }
+}
+
+async function submitPackage(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    btn.disabled = true;
+
+    const payload = {
+        customerId: parseInt(document.getElementById('pkgCustId').value),
+        employeeId: currentAgentId,
+        packageName: document.getElementById('pkgName').value,
+        category: document.getElementById('pkgCategory').value,
+        destination: document.getElementById('pkgDest').value,
+        travelersCount: parseInt(document.getElementById('pkgPax').value),
+        departureDate: document.getElementById('pkgDate').value,
+        includedServices: document.getElementById('pkgServices').value,
+        supplierCost: parseFloat(document.getElementById('pkgCost').value),
+        sellingPrice: parseFloat(document.getElementById('pkgPrice').value)
+    };
+
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/package/submit`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+        if (result && result.success) {
+            alert("📦 Package saved & commission updated!");
+            e.target.reset();
+            loadPackages();
+            loadAgentData(currentAgentId);
+        }
+    } catch (err) {
+        alert("Cloud connection timed out: " + err.message);
+    } finally {
+        btn.disabled = false;
+    }
+}
+
 loadAgentData(1);
 loadCustomers();
 loadHotels();
 loadVisas();
 loadTickets();
+loadPackages();
