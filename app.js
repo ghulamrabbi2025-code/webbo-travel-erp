@@ -211,9 +211,11 @@ async function loadHotels() {
                     <td class="p-3 text-slate-600">${h.customer_name || 'ID #' + h.customer_id}</td>
                     <td class="p-3 text-[11px] text-slate-500">${inDate} - ${outDate}</td>
                     <td class="p-3 font-mono font-bold text-emerald-700">+ BDT ${parseFloat(h.margin_earned).toLocaleString()}</td>
-                    <td class="p-3 text-right">
-                        <button onclick="editHotel(${h.hotel_booking_id}, '${h.city}', '${h.hotel_name}', '${h.room_type}', ${h.supplier_cost}, ${h.selling_price})" class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-[11px] font-bold">✏️ Edit</button>
-                    </td>
+                                  <td class="p-3 text-right space-x-1">
+                   <button onclick="openInvoice('HTL-' + ${h.hotel_booking_id}, '${h.customer_name || 'Client #' + h.customer_id}', '${h.hotel_name} (${h.city})', 'Room: ${h.room_type} | ${inDate} to ${outDate}', ${h.selling_price})" class="px-2 py-1 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-[11px] font-bold">🖨️ Invoice</button>
+                   <button onclick="editHotel(${h.hotel_booking_id}, '${h.city}', '${h.hotel_name}', '${h.room_type}', ${h.supplier_cost}, ${h.selling_price})" class="px-2 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-[11px] font-bold">✏️ Edit</button>
+               </td>
+
                 </tr>
             `;
         }).join('');
@@ -302,9 +304,10 @@ async function loadVisas() {
                 <td class="p-3 text-slate-600">${v.customer_name || 'ID #' + v.customer_id}</td>
                 <td class="p-3"><span class="px-2 py-0.5 bg-amber-50 text-amber-700 rounded-full text-[10px] font-bold">${v.tracking_status || 'Submitted'}</span></td>
                 <td class="p-3 font-mono font-bold text-emerald-700">+ BDT ${parseFloat(v.margin_earned).toLocaleString()}</td>
-                <td class="p-3 text-right">
-                    <button onclick="editVisa(${v.visa_booking_id}, '${v.country}', '${v.visa_type}', '${v.tracking_status || 'Submitted'}', ${v.supplier_cost}, ${v.selling_price})" class="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg text-[11px] font-bold">✏️ Edit</button>
-                </td>
+           <td class="p-3 text-right space-x-1">
+               <button onclick="openInvoice('VIS-' + ${v.visa_booking_id}, '${v.customer_name || 'Client #' + v.customer_id}', '${v.country} Visa (${v.visa_type})', 'Status: ${v.tracking_status || 'Submitted'}', ${v.selling_price})" class="px-2 py-1 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-[11px] font-bold">🖨️ Invoice</button>
+               <button onclick="editVisa(${v.visa_booking_id}, '${v.country}', '${v.visa_type}', '${v.tracking_status || 'Submitted'}', ${v.supplier_cost}, ${v.selling_price})" class="px-2 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg text-[11px] font-bold">✏️ Edit</button>
+           </td>
             </tr>
         `).join('');
     } catch (err) {
@@ -356,9 +359,10 @@ async function loadTickets() {
                 <td class="p-3 text-slate-600">${t.customer_name || 'ID #' + t.customer_id}</td>
                 <td class="p-3 font-bold text-slate-700">${t.airline_code}</td>
                 <td class="p-3 font-mono font-bold text-emerald-700">+ BDT ${parseFloat(t.margin_earned).toLocaleString()}</td>
-                <td class="p-3 text-right">
-                    <button onclick="editTicket(${t.ticket_id}, '${t.gds_pnr}', '${t.airline_code}', '${t.route}', ${t.supplier_cost}, ${t.selling_price})" class="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-[11px] font-bold">✏️ Edit</button>
-                </td>
+                           <td class="p-3 text-right space-x-1">
+               <button onclick="openInvoice('TKT-' + ${t.ticket_id}, '${t.customer_name || 'Client #' + t.customer_id}', 'Air Ticket (${t.airline_code}) - PNR: ${t.gds_pnr}', 'Routing: ${t.route}', ${t.selling_price})" class="px-2 py-1 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-[11px] font-bold">🖨️ Invoice</button>
+               <button onclick="editTicket(${t.ticket_id}, '${t.gds_pnr}', '${t.airline_code}', '${t.route}', ${t.supplier_cost}, ${t.selling_price})" class="px-2 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-[11px] font-bold">✏️ Edit</button>
+           </td>
             </tr>
         `).join('');
     } catch (err) {
@@ -415,9 +419,11 @@ async function loadPackages() {
                     <td class="p-3 text-slate-600">${p.customer_name || 'ID #' + p.customer_id}</td>
                     <td class="p-3 text-[11px] text-slate-600"><span class="font-bold">${p.travelers_count} Pax</span><br>${depDate}</td>
                     <td class="p-3 font-mono font-bold text-emerald-700">+ BDT ${parseFloat(p.margin_earned).toLocaleString()}</td>
-                    <td class="p-3 text-right">
-                        <button onclick="editPackage(${p.package_id}, '${p.package_name}', '${p.destination}', ${p.travelers_count}, '${p.included_services}', ${p.supplier_cost}, ${p.selling_price})" class="px-2.5 py-1 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-lg text-[11px] font-bold">✏️ Edit</button>
-                    </td>
+                               <td class="p-3 text-right space-x-1">
+                   <button onclick="openInvoice('PKG-' + ${p.package_id}, '${p.customer_name || 'Client #' + p.customer_id}', '${p.package_name} (${p.category})', '${p.destination} • ${p.travelers_count} Pax • ${p.included_services}', ${p.selling_price})" class="px-2 py-1 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-[11px] font-bold">🖨️ Invoice</button>
+                   <button onclick="editPackage(${p.package_id}, '${p.package_name}', '${p.destination}', ${p.travelers_count}, '${p.included_services}', ${p.supplier_cost}, ${p.selling_price})" class="px-2 py-1 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-lg text-[11px] font-bold">✏️ Edit</button>
+               </td>
+
                 </tr>
             `;
         }).join('');
