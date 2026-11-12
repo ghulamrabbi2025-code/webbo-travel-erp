@@ -372,5 +372,52 @@ res.json({ totalDue });
 res.status(500).json({ error: err.message });
 }
 });
+// 24. Fetch All Employees (For Dynamic Switcher & HR Table)
+app.get('/api/employees', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT employee_id, name, email, role, base_salary, commission_rate FROM employees ORDER BY employee_id ASC');
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 25. Hire / Add New Staff Member
+app.post('/api/employee/add', async (req, res) => {
+  const { name, email, role, baseSalary, commissionRate, password } = req.body;
+  try {
+    const newEmp = await pool.query(
+      `INSERT INTO employees (name, email, role, base_salary, commission_rate, password) 
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING employee_id, name`,
+      [name, email.trim(), role, parseFloat(baseSalary), parseFloat(commissionRate), password || 'webbo2026']
+    );
+    res.status(201).json({ success: true, employee: newEmp.rows.at(0) });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 26. Update Staff Salary, Commission Rate, Role, or Password
+app.put('/api/employee/update/:id', async (req, res) => {
+  const { id } = req.params;
+  const { name, role, baseSalary, commissionRate, newPassword } = req.body;
+  try {
+    if (newPassword && newPassword.trim() !== '') {
+      await pool.query(
+        'UPDATE employees SET name = $1, role = $2, base_salary = $3, commission_rate = $4, password = $5 WHERE employee_id = $6',
+        [name, role, parseFloat(baseSalary), parseFloat(commissionRate), newPassword.trim(), parseInt(id, 10)]
+      );
+    } else {
+      await pool.query(
+        'UPDATE employees SET name = $1, role = $2, base_salary = $3, commission_rate = $4 WHERE employee_id = $5',
+        [name, role, parseFloat(baseSalary), parseFloat(commissionRate), parseInt(id, 10)]
+      );
+    }
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(Cloud ERP Backend running on Port ${PORT}));
