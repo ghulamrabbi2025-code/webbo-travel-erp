@@ -229,6 +229,50 @@ app.put('/api/ticket/update/:id', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// 14. Create Custom Tour or Hajj/Umrah Package
+app.post('/api/package/submit', async (req, res) => {
+  const { customerId, employeeId, packageName, category, destination, travelersCount, departureDate, includedServices, supplierCost, sellingPrice } = req.body;
+  try {
+    const newPkg = await pool.query(
+      `INSERT INTO tour_packages (customer_id, employee_id, package_name, category, destination, travelers_count, departure_date, included_services, supplier_cost, selling_price) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
+      [customerId, employeeId, packageName, category, destination, parseInt(travelersCount, 10) || 1, departureDate, includedServices, parseFloat(supplierCost), parseFloat(sellingPrice)]
+    );
+    res.status(201).json({ success: true, record: newPkg.rows.at(0) });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 15. Fetch All Packages
+app.get('/api/packages', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT p.*, c.name as customer_name 
+      FROM tour_packages p
+      LEFT JOIN customers c ON p.customer_id = c.customer_id
+      ORDER BY p.package_id DESC
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 16. Edit / Update Existing Package
+app.put('/api/package/update/:id', async (req, res) => {
+  const { id } = req.params;
+  const { packageName, destination, travelersCount, includedServices, supplierCost, sellingPrice } = req.body;
+  try {
+    await pool.query(
+      `UPDATE tour_packages SET package_name = $1, destination = $2, travelers_count = $3, included_services = $4, supplier_cost = $5, selling_price = $6 WHERE package_id = $7`,
+      [packageName, destination, parseInt(travelersCount, 10) || 1, includedServices, parseFloat(supplierCost), parseFloat(sellingPrice), parseInt(id, 10)]
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Cloud ERP Backend running on Port ${PORT}`));
