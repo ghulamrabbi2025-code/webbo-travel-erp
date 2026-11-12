@@ -11,7 +11,7 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }
 });
 
-// 1. Fetch Payroll & Commissions (Visas + Flights + Hotels)
+// 1. Fetch Payroll & Commissions (Visas + Flights + Hotels + Packages)
 app.get('/api/payroll/:employeeId', async (req, res) => {
   const { employeeId } = req.params;
   try {
@@ -42,14 +42,15 @@ app.get('/api/payroll/:employeeId', async (req, res) => {
   }
 });
 
-// 2. Submit Tourist / Umrah Visa
+// 2. Submit Tourist / Umrah Visa (With Partial Payment Support)
 app.post('/api/visa/submit', async (req, res) => {
-  const { customerId, employeeId, country, visaType, supplierCost, sellingPrice } = req.body;
+  const { customerId, employeeId, country, visaType, supplierCost, sellingPrice, amountPaid } = req.body;
+  const paid = amountPaid !== undefined && amountPaid !== '' ? parseFloat(amountPaid) : parseFloat(sellingPrice);
   try {
     const newVisa = await pool.query(
-      `INSERT INTO visa_bookings (customer_id, employee_id, country, visa_type, supplier_cost, selling_price) 
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-      [customerId, employeeId, country, visaType, parseFloat(supplierCost), parseFloat(sellingPrice)]
+      `INSERT INTO visa_bookings (customer_id, employee_id, country, visa_type, supplier_cost, selling_price, amount_paid) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+      [customerId, employeeId, country, visaType, parseFloat(supplierCost), parseFloat(sellingPrice), paid]
     );
     res.status(201).json({ success: true, record: newVisa.rows.at(0) });
   } catch (err) {
@@ -57,14 +58,15 @@ app.post('/api/visa/submit', async (req, res) => {
   }
 });
 
-// 3. Submit Air Ticket PNR
+// 3. Submit Air Ticket PNR (With Partial Payment Support)
 app.post('/api/ticket/submit', async (req, res) => {
-  const { customerId, employeeId, gdsPnr, airlineCode, route, supplierCost, sellingPrice } = req.body;
+  const { customerId, employeeId, gdsPnr, airlineCode, route, supplierCost, sellingPrice, amountPaid } = req.body;
+  const paid = amountPaid !== undefined && amountPaid !== '' ? parseFloat(amountPaid) : parseFloat(sellingPrice);
   try {
     const newTicket = await pool.query(
-      `INSERT INTO flight_tickets (customer_id, employee_id, gds_pnr, airline_code, route, supplier_cost, selling_price) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-      [customerId, employeeId, gdsPnr, airlineCode, route, parseFloat(supplierCost), parseFloat(sellingPrice)]
+      `INSERT INTO flight_tickets (customer_id, employee_id, gds_pnr, airline_code, route, supplier_cost, selling_price, amount_paid) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+      [customerId, employeeId, gdsPnr, airlineCode, route, parseFloat(supplierCost), parseFloat(sellingPrice), paid]
     );
     res.status(201).json({ success: true, record: newTicket.rows.at(0) });
   } catch (err) {
@@ -128,14 +130,15 @@ app.put('/api/customer/update/:id', async (req, res) => {
   }
 });
 
-// 7. Submit Worldwide Hotel Booking
+// 7. Submit Worldwide Hotel Booking (With Partial Payment Support)
 app.post('/api/hotel/submit', async (req, res) => {
-  const { customerId, employeeId, city, hotelName, roomType, checkIn, checkOut, supplierCost, sellingPrice } = req.body;
+  const { customerId, employeeId, city, hotelName, roomType, checkIn, checkOut, supplierCost, sellingPrice, amountPaid } = req.body;
+  const paid = amountPaid !== undefined && amountPaid !== '' ? parseFloat(amountPaid) : parseFloat(sellingPrice);
   try {
     const newHotel = await pool.query(
-      `INSERT INTO hotel_bookings (customer_id, employee_id, city, hotel_name, room_type, check_in, check_out, supplier_cost, selling_price) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
-      [customerId, employeeId, city, hotelName, roomType, checkIn, checkOut, parseFloat(supplierCost), parseFloat(sellingPrice)]
+      `INSERT INTO hotel_bookings (customer_id, employee_id, city, hotel_name, room_type, check_in, check_out, supplier_cost, selling_price, amount_paid) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
+      [customerId, employeeId, city, hotelName, roomType, checkIn, checkOut, parseFloat(supplierCost), parseFloat(sellingPrice), paid]
     );
     res.status(201).json({ success: true, record: newHotel.rows.at(0) });
   } catch (err) {
@@ -172,6 +175,7 @@ app.put('/api/hotel/update/:id', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 // 10. Fetch All Visa Bookings
 app.get('/api/visas', async (req, res) => {
   try {
@@ -231,124 +235,142 @@ app.put('/api/ticket/update/:id', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-// 14. Create Custom Tour or Hajj/Umrah Package
-app.post('/api/package/submit', async (req, res) => {
-  const { customerId, employeeId, packageName, category, destination, travelersCount, departureDate, includedServices, supplierCost, sellingPrice } = req.body;
-  try {
-    const newPkg = await pool.query(
-      `INSERT INTO tour_packages (customer_id, employee_id, package_name, category, destination, travelers_count, departure_date, included_services, supplier_cost, selling_price) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
-      [customerId, employeeId, packageName, category, destination, parseInt(travelersCount, 10) || 1, departureDate, includedServices, parseFloat(supplierCost), parseFloat(sellingPrice)]
-    );
-    res.status(201).json({ success: true, record: newPkg.rows.at(0) });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
 
+// 14. Create Custom Tour or Hajj/Umrah Package (With Partial Payment Support)
+app.post('/api/package/submit', async (req, res) => {
+const { customerId, employeeId, packageName, category, destination, travelersCount, departureDate, includedServices, supplierCost, sellingPrice, amountPaid } = req.body;
+const paid = amountPaid !== undefined && amountPaid !== '' ? parseFloat(amountPaid) : parseFloat(sellingPrice);
+try {
+const newPkg = await pool.query(
+INSERT INTO tour_packages (customer_id, employee_id, package_name, category, destination, travelers_count, departure_date, included_services, supplier_cost, selling_price, amount_paid)  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *,
+[customerId, employeeId, packageName, category, destination, parseInt(travelersCount, 10) || 1, departureDate, includedServices, parseFloat(supplierCost), parseFloat(sellingPrice), paid]
+);
+res.status(201).json({ success: true, record: newPkg.rows.at(0) });
+} catch (err) {
+res.status(500).json({ error: err.message });
+}
+});
 // 15. Fetch All Packages
 app.get('/api/packages', async (req, res) => {
-  try {
-    const result = await pool.query(`
-      SELECT p.*, c.name as customer_name 
-      FROM tour_packages p
-      LEFT JOIN customers c ON p.customer_id = c.customer_id
-      ORDER BY p.package_id DESC
-    `);
-    res.json(result.rows);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+try {
+const result = await pool.query(SELECT p.*, c.name as customer_name  FROM tour_packages p LEFT JOIN customers c ON p.customer_id = c.customer_id ORDER BY p.package_id DESC);
+res.json(result.rows);
+} catch (err) {
+res.status(500).json({ error: err.message });
+}
 });
-
 // 16. Edit / Update Existing Package
 app.put('/api/package/update/:id', async (req, res) => {
-  const { id } = req.params;
-  const { packageName, destination, travelersCount, includedServices, supplierCost, sellingPrice } = req.body;
-  try {
-    await pool.query(
-      `UPDATE tour_packages SET package_name = $1, destination = $2, travelers_count = $3, included_services = $4, supplier_cost = $5, selling_price = $6 WHERE package_id = $7`,
-      [packageName, destination, parseInt(travelersCount, 10) || 1, includedServices, parseFloat(supplierCost), parseFloat(sellingPrice), parseInt(id, 10)]
-    );
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+const { id } = req.params;
+const { packageName, destination, travelersCount, includedServices, supplierCost, sellingPrice } = req.body;
+try {
+await pool.query(
+UPDATE tour_packages SET package_name = $1, destination = $2, travelers_count = $3, included_services = $4, supplier_cost = $5, selling_price = $6 WHERE package_id = $7,
+[packageName, destination, parseInt(travelersCount, 10) || 1, includedServices, parseFloat(supplierCost), parseFloat(sellingPrice), parseInt(id, 10)]
+);
+res.json({ success: true });
+} catch (err) {
+res.status(500).json({ error: err.message });
+}
 });
 // 17. Staff Login Authentication
 app.post('/api/login', async (req, res) => {
-  const { email, password } = req.body;
-  try {
-    const result = await pool.query(
-      'SELECT employee_id, name, email, role FROM employees WHERE LOWER(email) = LOWER($1) AND password = $2',
-      [email.trim(), password]
-    );
-    if (result.rows.length === 0) {
-      return res.status(401).json({ success: false, error: 'Invalid staff email or password.' });
-    }
-    res.json({ success: true, user: result.rows.at(0) });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
+const { email, password } = req.body;
+try {
+const result = await pool.query(
+'SELECT employee_id, name, email, role FROM employees WHERE LOWER(email) = LOWER($1) AND password = $2',
+[email.trim(), password]
+);
+if (result.rows.length === 0) {
+return res.status(401).json({ success: false, error: 'Invalid staff email or password.' });
+}
+res.json({ success: true, user: result.rows.at(0) });
+} catch (err) {
+res.status(500).json({ success: false, error: err.message });
+}
 });
 // 18. Log New Office Expense
 app.post('/api/expense/submit', async (req, res) => {
-  const { category, description, amount, expenseDate, loggedBy } = req.body;
-  try {
-    const newExp = await pool.query(
-      `INSERT INTO office_expenses (category, description, amount, expense_date, logged_by) 
-       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-      [category, description, parseFloat(amount), expenseDate, loggedBy]
-    );
-    res.status(201).json({ success: true, record: newExp.rows.at(0) });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+const { category, description, amount, expenseDate, loggedBy } = req.body;
+try {
+const newExp = await pool.query(
+INSERT INTO office_expenses (category, description, amount, expense_date, logged_by)  VALUES ($1, $2, $3, $4, $5) RETURNING *,
+[category, description, parseFloat(amount), expenseDate, loggedBy]
+);
+res.status(201).json({ success: true, record: newExp.rows.at(0) });
+} catch (err) {
+res.status(500).json({ error: err.message });
+}
 });
-
 // 19. Fetch All Expenses
 app.get('/api/expenses', async (req, res) => {
-  try {
-    const result = await pool.query('SELECT * FROM office_expenses ORDER BY expense_date DESC, expense_id DESC');
-    res.json(result.rows);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+try {
+const result = await pool.query('SELECT * FROM office_expenses ORDER BY expense_date DESC, expense_id DESC');
+res.json(result.rows);
+} catch (err) {
+res.status(500).json({ error: err.message });
+}
 });
-
 // 20. Edit / Update Existing Expense
 app.put('/api/expense/update/:id', async (req, res) => {
-  const { id } = req.params;
-  const { category, description, amount } = req.body;
-  try {
-    await pool.query(
-      'UPDATE office_expenses SET category = $1, description = $2, amount = $3 WHERE expense_id = $4',
-      [category, description, parseFloat(amount), parseInt(id, 10)]
-    );
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+const { id } = req.params;
+const { category, description, amount } = req.body;
+try {
+await pool.query(
+'UPDATE office_expenses SET category = $1, description = $2, amount = $3 WHERE expense_id = $4',
+[category, description, parseFloat(amount), parseInt(id, 10)]
+);
+res.json({ success: true });
+} catch (err) {
+res.status(500).json({ error: err.message });
+}
 });
-
 // 21. Agency-Wide Profit & Loss Summary
 app.get('/api/pnl', async (req, res) => {
-  try {
-    const vSum = await pool.query('SELECT COALESCE(SUM(margin_earned), 0) as sum FROM visa_bookings');
-    const fSum = await pool.query('SELECT COALESCE(SUM(margin_earned), 0) as sum FROM flight_tickets');
-    const hSum = await pool.query('SELECT COALESCE(SUM(margin_earned), 0) as sum FROM hotel_bookings');
-    const pSum = await pool.query('SELECT COALESCE(SUM(margin_earned), 0) as sum FROM tour_packages');
-    const expSum = await pool.query('SELECT COALESCE(SUM(amount), 0) as sum FROM office_expenses');
-
-    const grossProfit = parseFloat(vSum.rows.at(0).sum) + parseFloat(fSum.rows.at(0).sum) + parseFloat(hSum.rows.at(0).sum) + parseFloat(pSum.rows.at(0).sum);
-    const totalExpenses = parseFloat(expSum.rows.at(0).sum);
-    const netProfit = grossProfit - totalExpenses;
-
-    res.json({ grossProfit, totalExpenses, netProfit });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+try {
+const vSum = await pool.query('SELECT COALESCE(SUM(margin_earned), 0) as sum FROM visa_bookings');
+const fSum = await pool.query('SELECT COALESCE(SUM(margin_earned), 0) as sum FROM flight_tickets');
+const hSum = await pool.query('SELECT COALESCE(SUM(margin_earned), 0) as sum FROM hotel_bookings');
+const pSum = await pool.query('SELECT COALESCE(SUM(margin_earned), 0) as sum FROM tour_packages');
+const expSum = await pool.query('SELECT COALESCE(SUM(amount), 0) as sum FROM office_expenses');
+const grossProfit = parseFloat(vSum.rows.at(0).sum) + parseFloat(fSum.rows.at(0).sum) + parseFloat(hSum.rows.at(0).sum) + parseFloat(pSum.rows.at(0).sum);
+const totalExpenses = parseFloat(expSum.rows.at(0).sum);
+const netProfit = grossProfit - totalExpenses;
+res.json({ grossProfit, totalExpenses, netProfit });
+} catch (err) {
+res.status(500).json({ error: err.message });
+}
 });
-
+// 22. Collect Installment / Update Amount Paid
+app.put('/api/payment/collect', async (req, res) => {
+const { type, id, newPaidAmount } = req.body;
+const tableMap = {
+visa: { table: 'visa_bookings', col: 'visa_booking_id' },
+ticket: { table: 'flight_tickets', col: 'ticket_id' },
+hotel: { table: 'hotel_bookings', col: 'hotel_booking_id' },
+package: { table: 'tour_packages', col: 'package_id' }
+};
+const target = tableMap[type];
+if (!target) return res.status(400).json({ error: 'Invalid booking type' });
+try {
+await pool.query(UPDATE ${target.table} SET amount_paid = $1 WHERE ${target.col} = $2, [parseFloat(newPaidAmount), parseInt(id, 10)]);
+res.json({ success: true });
+} catch (err) {
+res.status(500).json({ error: err.message });
+}
+});
+// 23. Total Client Due Receivable Summary
+app.get('/api/receivables', async (req, res) => {
+try {
+const vDue = await pool.query('SELECT COALESCE(SUM(selling_price - COALESCE(amount_paid, selling_price)), 0) as due FROM visa_bookings');
+const fDue = await pool.query('SELECT COALESCE(SUM(selling_price - COALESCE(amount_paid, selling_price)), 0) as due FROM flight_tickets');
+const hDue = await pool.query('SELECT COALESCE(SUM(selling_price - COALESCE(amount_paid, selling_price)), 0) as due FROM hotel_bookings');
+const pDue = await pool.query('SELECT COALESCE(SUM(selling_price - COALESCE(amount_paid, selling_price)), 0) as due FROM tour_packages');
+const totalDue = parseFloat(vDue.rows.at(0).due) + parseFloat(fDue.rows.at(0).due) + parseFloat(hDue.rows.at(0).due) + parseFloat(pDue.rows.at(0).due);
+res.json({ totalDue });
+} catch (err) {
+res.status(500).json({ error: err.message });
+}
+});
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Cloud ERP Backend running on Port ${PORT}`));
+app.listen(PORT, () => console.log(Cloud ERP Backend running on Port ${PORT}));
