@@ -429,6 +429,67 @@
             </div>
 
         </div>
+        <!-- Printable Client Invoice & BDT Receipt Modal -->
+        <div id="invoiceModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl max-w-lg w-full p-6 md:p-8 shadow-2xl border border-slate-200 space-y-6" id="printableReceipt">
+                <div class="flex justify-between items-start border-b border-slate-200 pb-4">
+                    <div>
+                        <h2 class="text-xl font-black text-emerald-800 tracking-tight">🕋 Webbo Travel & Tours</h2>
+                        <p class="text-[11px] text-slate-500 font-medium">Dhaka, Bangladesh • Official Tax & Booking Receipt</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase">Paid / Confirmed</span>
+                        <p id="invNumber" class="text-xs font-mono font-bold text-slate-700 mt-1.5">INV-0001</p>
+                        <p id="invDate" class="text-[10px] text-slate-400">Date: --</p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100 text-xs flex justify-between">
+                    <div>
+                        <span class="text-[9px] uppercase font-bold text-slate-400 block">Billed To Client</span>
+                        <span id="invClient" class="font-bold text-slate-800 text-sm">Client Name</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[9px] uppercase font-bold text-slate-400 block">Issued By</span>
+                        <span id="invAgent" class="font-semibold text-slate-700">Travel Consultant</span>
+                    </div>
+                </div>
+
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="border-b border-slate-200 text-[10px] uppercase text-slate-400">
+                            <th class="py-2">Service Description</th>
+                            <th class="py-2 text-right">Amount (BDT)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        <tr>
+                            <td class="py-3">
+                                <div id="invServiceTitle" class="font-bold text-slate-800 text-sm">Service Title</div>
+                                <div id="invServiceSub" class="text-[11px] text-slate-500 mt-0.5">Details</div>
+                            </td>
+                            <td id="invAmount" class="py-3 text-right font-mono font-bold text-slate-800 text-sm">BDT 0.00</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr class="border-t-2 border-slate-800 bg-emerald-50/50">
+                            <td class="p-3 font-extrabold text-slate-800 text-sm">Total Payable (BDT)</td>
+                            <td id="invTotal" class="p-3 text-right font-mono font-black text-emerald-700 text-base">BDT 0.00</td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <div class="text-[10px] text-slate-400 text-center border-t border-slate-100 pt-3">
+                    Thank you for traveling with Webbo Travel & Tours. Computer-generated receipt.
+                </div>
+
+                <!-- Action Buttons (Hidden when printing) -->
+                <div class="flex gap-3 pt-2 print:hidden">
+                    <button onclick="printInvoice()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md">🖨️ Print / Save PDF</button>
+                    <button onclick="closeInvoice()" class="px-5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-xs">Close</button>
+                </div>
+            </div>
+        </div>
 
     </main>
     <footer class="text-center py-6 text-xs text-slate-400 border-t bg-white mt-12">&copy; 2026 Webbo Technology Travel ERP Framework.</footer>
