@@ -11,7 +11,7 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }
 });
 
-// 1. Fetch Payroll & Commissions (Visas + Flights + Hotels + Packages)
+// 1. Fetch Payroll & Commissions
 app.get('/api/payroll/:employeeId', async (req, res) => {
   const { employeeId } = req.params;
   try {
@@ -25,7 +25,6 @@ app.get('/api/payroll/:employeeId', async (req, res) => {
     const pkgMargin = await pool.query('SELECT COALESCE(SUM(margin_earned), 0) as sum FROM tour_packages WHERE employee_id = $1', [parseInt(employeeId, 10)]);
 
     const totalSalesMargin = parseFloat(visaMargin.rows.at(0).sum) + parseFloat(flightMargin.rows.at(0).sum) + parseFloat(hotelMargin.rows.at(0).sum) + parseFloat(pkgMargin.rows.at(0).sum);
-
     const commissionEarned = totalSalesMargin * (parseFloat(employee.commission_rate) / 100);
     const netPayout = parseFloat(employee.base_salary) + commissionEarned;
 
@@ -42,7 +41,7 @@ app.get('/api/payroll/:employeeId', async (req, res) => {
   }
 });
 
-// 2. Submit Tourist / Umrah Visa (With Partial Payment Support)
+// 2. Submit Tourist / Umrah Visa
 app.post('/api/visa/submit', async (req, res) => {
   const { customerId, employeeId, country, visaType, supplierCost, sellingPrice, amountPaid } = req.body;
   const paid = amountPaid !== undefined && amountPaid !== '' ? parseFloat(amountPaid) : parseFloat(sellingPrice);
@@ -58,7 +57,7 @@ app.post('/api/visa/submit', async (req, res) => {
   }
 });
 
-// 3. Submit Air Ticket PNR (With Partial Payment Support)
+// 3. Submit Air Ticket PNR
 app.post('/api/ticket/submit', async (req, res) => {
   const { customerId, employeeId, gdsPnr, airlineCode, route, supplierCost, sellingPrice, amountPaid } = req.body;
   const paid = amountPaid !== undefined && amountPaid !== '' ? parseFloat(amountPaid) : parseFloat(sellingPrice);
@@ -130,7 +129,7 @@ app.put('/api/customer/update/:id', async (req, res) => {
   }
 });
 
-// 7. Submit Worldwide Hotel Booking (With Partial Payment Support)
+// 7. Submit Worldwide Hotel Booking
 app.post('/api/hotel/submit', async (req, res) => {
   const { customerId, employeeId, city, hotelName, roomType, checkIn, checkOut, supplierCost, sellingPrice, amountPaid } = req.body;
   const paid = amountPaid !== undefined && amountPaid !== '' ? parseFloat(amountPaid) : parseFloat(sellingPrice);
@@ -191,7 +190,7 @@ app.get('/api/visas', async (req, res) => {
   }
 });
 
-// 11. Edit / Update Existing Visa Booking
+// 11. Edit Visa Booking
 app.put('/api/visa/update/:id', async (req, res) => {
   const { id } = req.params;
   const { country, visaType, trackingStatus, supplierCost, sellingPrice } = req.body;
@@ -221,7 +220,7 @@ app.get('/api/tickets', async (req, res) => {
   }
 });
 
-// 13. Edit / Update Existing Flight Ticket
+// 13. Edit Flight Ticket
 app.put('/api/ticket/update/:id', async (req, res) => {
   const { id } = req.params;
   const { gdsPnr, airlineCode, route, supplierCost, sellingPrice } = req.body;
@@ -236,11 +235,11 @@ app.put('/api/ticket/update/:id', async (req, res) => {
   }
 });
 
-// 14. Create Custom Tour or Hajj/Umrah Package (With Partial Payment Support)
+// 14. Create Custom Tour or Hajj/Umrah Package
 app.post('/api/package/submit', async (req, res) => {
-const { customerId, employeeId, packageName, category, destination, travelersCount, departureDate, includedServices, supplierCost, sellingPrice, amountPaid } = req.body;
-const paid = amountPaid !== undefined && amountPaid !== '' ? parseFloat(amountPaid) : parseFloat(sellingPrice);
-try {
+  const { customerId, employeeId, packageName, category, destination, travelersCount, departureDate, includedServices, supplierCost, sellingPrice, amountPaid } = req.body;
+  const paid = amountPaid !== undefined && amountPaid !== '' ? parseFloat(amountPaid) : parseFloat(sellingPrice);
+  try {
 const newPkg = await pool.query(
 INSERT INTO tour_packages (customer_id, employee_id, package_name, category, destination, travelers_count, departure_date, included_services, supplier_cost, selling_price, amount_paid)  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *,
 [customerId, employeeId, packageName, category, destination, parseInt(travelersCount, 10) || 1, departureDate, includedServices, parseFloat(supplierCost), parseFloat(sellingPrice), paid]
@@ -259,7 +258,7 @@ res.json(result.rows);
 res.status(500).json({ error: err.message });
 }
 });
-// 16. Edit / Update Existing Package
+// 16. Edit Package
 app.put('/api/package/update/:id', async (req, res) => {
 const { id } = req.params;
 const { packageName, destination, travelersCount, includedServices, supplierCost, sellingPrice } = req.body;
@@ -311,7 +310,7 @@ res.json(result.rows);
 res.status(500).json({ error: err.message });
 }
 });
-// 20. Edit / Update Existing Expense
+// 20. Edit Expense
 app.put('/api/expense/update/:id', async (req, res) => {
 const { id } = req.params;
 const { category, description, amount } = req.body;
@@ -372,52 +371,48 @@ res.json({ totalDue });
 res.status(500).json({ error: err.message });
 }
 });
-// 24. Fetch All Employees (For Dynamic Switcher & HR Table)
+// 24. Fetch All Employees
 app.get('/api/employees', async (req, res) => {
-  try {
-    const result = await pool.query('SELECT employee_id, name, email, role, base_salary, commission_rate FROM employees ORDER BY employee_id ASC');
-    res.json(result.rows);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+try {
+const result = await pool.query('SELECT employee_id, name, email, role, base_salary, commission_rate FROM employees ORDER BY employee_id ASC');
+res.json(result.rows);
+} catch (err) {
+res.status(500).json({ error: err.message });
+}
 });
-
 // 25. Hire / Add New Staff Member
 app.post('/api/employee/add', async (req, res) => {
-  const { name, email, role, baseSalary, commissionRate, password } = req.body;
-  try {
-    const newEmp = await pool.query(
-      `INSERT INTO employees (name, email, role, base_salary, commission_rate, password) 
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING employee_id, name`,
-      [name, email.trim(), role, parseFloat(baseSalary), parseFloat(commissionRate), password || 'webbo2026']
-    );
-    res.status(201).json({ success: true, employee: newEmp.rows.at(0) });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+const { name, email, role, baseSalary, commissionRate, password } = req.body;
+try {
+const newEmp = await pool.query(
+INSERT INTO employees (name, email, role, base_salary, commission_rate, password)  VALUES ($1, $2, $3, $4, $5, $6) RETURNING employee_id, name,
+[name, email.trim(), role, parseFloat(baseSalary), parseFloat(commissionRate), password || 'webbo2026']
+);
+res.status(201).json({ success: true, employee: newEmp.rows.at(0) });
+} catch (err) {
+res.status(500).json({ error: err.message });
+}
 });
-
 // 26. Update Staff Salary, Commission Rate, Role, or Password
 app.put('/api/employee/update/:id', async (req, res) => {
-  const { id } = req.params;
-  const { name, role, baseSalary, commissionRate, newPassword } = req.body;
-  try {
-    if (newPassword && newPassword.trim() !== '') {
-      await pool.query(
-        'UPDATE employees SET name = $1, role = $2, base_salary = $3, commission_rate = $4, password = $5 WHERE employee_id = $6',
-        [name, role, parseFloat(baseSalary), parseFloat(commissionRate), newPassword.trim(), parseInt(id, 10)]
-      );
-    } else {
-      await pool.query(
-        'UPDATE employees SET name = $1, role = $2, base_salary = $3, commission_rate = $4 WHERE employee_id = $5',
-        [name, role, parseFloat(baseSalary), parseFloat(commissionRate), parseInt(id, 10)]
-      );
-    }
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+const { id } = req.params;
+const { name, role, baseSalary, commissionRate, newPassword } = req.body;
+try {
+if (newPassword && newPassword.trim() !== '') {
+await pool.query(
+'UPDATE employees SET name = $1, role = $2, base_salary = $3, commission_rate = $4, password = $5 WHERE employee_id = $6',
+[name, role, parseFloat(baseSalary), parseFloat(commissionRate), newPassword.trim(), parseInt(id, 10)]
+);
+} else {
+await pool.query(
+'UPDATE employees SET name = $1, role = $2, base_salary = $3, commission_rate = $4 WHERE employee_id = $5',
+[name, role, parseFloat(baseSalary), parseFloat(commissionRate), parseInt(id, 10)]
+);
+}
+res.json({ success: true });
+} catch (err) {
+res.status(500).json({ error: err.message });
+}
 });
-
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(Cloud ERP Backend running on Port ${PORT}));
