@@ -360,6 +360,75 @@
             </div>
 
         </div>
+        <!-- Custom Tour & Hajj/Umrah Package Builder Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-2">
+            
+            <!-- Package Builder Form -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 space-y-4">
+                <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
+                    <span class="text-xl">🧳</span>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm md:text-base">Custom Tour & Hajj/Umrah Builder</h3>
+                        <p class="text-[10px] text-slate-400 font-medium">Bundle flights, hotels, visas & transport into one package.</p>
+                    </div>
+                </div>
+                <form id="packageForm" class="space-y-3 text-xs font-semibold" onsubmit="submitPackage(event)">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="number" id="pkgCustId" required value="1" placeholder="Lead Customer ID" class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                        <select id="pkgCategory" class="w-full p-2.5 bg-slate-50 border rounded-xl font-semibold text-slate-700">
+                            <option value="Umrah Package">Umrah Package</option>
+                            <option value="Hajj Package">Hajj Package</option>
+                            <option value="International Tour">International Tour</option>
+                            <option value="Domestic Tour">Domestic Tour</option>
+                            <option value="Corporate Group">Corporate Group</option>
+                        </select>
+                    </div>
+                    <input type="text" id="pkgName" required placeholder="Package Title (e.g. 14-Day VIP Umrah / Bangkok 4D3N)" class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="text" id="pkgDest" required placeholder="Destination(s)" class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                        <input type="number" id="pkgPax" required value="2" min="1" placeholder="Total Pax (Travelers)" class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] uppercase font-bold text-slate-400 mb-0.5">Departure Date</label>
+                        <input type="date" id="pkgDate" required class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                    </div>
+                    <input type="text" id="pkgServices" required placeholder="Included: Air Ticket + 5-Star Hotel + Visa + Ziyarah/Transfer" class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="number" id="pkgCost" required placeholder="Total Net Cost (BDT)" class="w-full p-2.5 bg-slate-50 border rounded-xl text-red-600 font-bold">
+                        <input type="number" id="pkgPrice" required placeholder="Client Package Price (BDT)" class="w-full p-2.5 bg-slate-50 border rounded-xl text-emerald-600 font-bold">
+                    </div>
+                    <button type="submit" class="w-full bg-teal-700 hover:bg-teal-800 text-white font-bold p-3 rounded-xl shadow-md">📦 Save Tour / Umrah Package</button>
+                </form>
+            </div>
+
+            <!-- Live Packages Ledger with Edit Controls -->
+            <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden flex flex-col justify-between">
+                <div>
+                    <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                        <h3 class="font-bold text-slate-800 text-sm md:text-base">🗂️ Custom Tour & Hajj/Umrah Ledger</h3>
+                        <span class="bg-teal-50 text-teal-700 text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase">Editable Packages</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-slate-50 text-slate-400 font-bold text-[9px] uppercase border-b">
+                                    <th class="p-3">Package & Services</th>
+                                    <th class="p-3">Lead Client</th>
+                                    <th class="p-3">Pax & Date</th>
+                                    <th class="p-3">Profit (BDT)</th>
+                                    <th class="p-3 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="packageTableBody" class="text-slate-700 divide-y divide-slate-100 font-medium">
+                                <tr><td colspan="5" class="p-4 text-center text-slate-400">Loading packages...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="p-3 bg-slate-50 border-t text-[10px] text-slate-400 text-center font-semibold">Click "Edit" on any package to update pax count, services, or BDT pricing.</div>
+            </div>
+
+        </div>
 
     </main>
     <footer class="text-center py-6 text-xs text-slate-400 border-t bg-white mt-12">&copy; 2026 Webbo Technology Travel ERP Framework.</footer>
