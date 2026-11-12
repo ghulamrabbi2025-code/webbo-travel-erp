@@ -240,15 +240,16 @@ app.post('/api/package/submit', async (req, res) => {
   const { customerId, employeeId, packageName, category, destination, travelersCount, departureDate, includedServices, supplierCost, sellingPrice, amountPaid } = req.body;
   const paid = amountPaid !== undefined && amountPaid !== '' ? parseFloat(amountPaid) : parseFloat(sellingPrice);
   try {
-const newPkg = await pool.query(
-INSERT INTO tour_packages (customer_id, employee_id, package_name, category, destination, travelers_count, departure_date, included_services, supplier_cost, selling_price, amount_paid)  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *,
-[customerId, employeeId, packageName, category, destination, parseInt(travelersCount, 10) || 1, departureDate, includedServices, parseFloat(supplierCost), parseFloat(sellingPrice), paid]
-);
-res.status(201).json({ success: true, record: newPkg.rows.at(0) });
-} catch (err) {
-res.status(500).json({ error: err.message });
-}
+    const newPkg = await pool.query(
+      "INSERT INTO tour_packages (customer_id, employee_id, package_name, category, destination, travelers_count, departure_date, included_services, supplier_cost, selling_price, amount_paid) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *",
+      [customerId, employeeId, packageName, category, destination, parseInt(travelersCount, 10) || 1, departureDate, includedServices, parseFloat(supplierCost), parseFloat(sellingPrice), paid]
+    );
+    res.status(201).json({ success: true, record: newPkg.rows.at(0) });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
+
 // 15. Fetch All Packages
 app.get('/api/packages', async (req, res) => {
 try {
