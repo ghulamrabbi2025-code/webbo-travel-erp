@@ -523,6 +523,90 @@
                 </div>
             </div>
         </div>
+        <!-- Agency Profit & Loss (P&L) Summary Banner -->
+        <div class="pt-4 space-y-4">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-extrabold text-slate-800 tracking-tight">📈 Agency Profit & Loss (P&L) Statement</h2>
+                <span class="bg-slate-800 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase">Live Accounting</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 border-l-4 border-l-emerald-500">
+                    <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Total Booking Gross Profit</span>
+                    <h3 id="pnlGross" class="text-2xl font-black text-slate-800 mt-1">BDT 0.00</h3>
+                    <p class="text-[11px] text-slate-400 mt-0.5">Combined margins (Visas + Flights + Hotels + Packages)</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 border-l-4 border-l-red-500">
+                    <span class="text-[10px] font-bold text-red-600 uppercase tracking-wider">Total Office Expenses</span>
+                    <h3 id="pnlExpenses" class="text-2xl font-black text-red-600 mt-1">BDT 0.00</h3>
+                    <p class="text-[11px] text-slate-400 mt-0.5">Rent, utilities, marketing & operational costs</p>
+                </div>
+
+                <div class="bg-slate-900 p-5 rounded-2xl shadow-md text-white border-l-4 border-l-amber-400">
+                    <span class="text-[10px] font-bold text-amber-400 uppercase tracking-wider">Real Net Agency Profit</span>
+                    <h3 id="pnlNet" class="text-2xl font-black text-white mt-1">BDT 0.00</h3>
+                    <p class="text-[11px] text-slate-300 mt-0.5">Gross Profit minus Total Office Expenses</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Expense Logger & Editable Ledger -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-2">
+            
+            <!-- Log Expense Form -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 space-y-4">
+                <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
+                    <span class="text-xl">💸</span>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm md:text-base">Log Office Expense</h3>
+                        <p class="text-[10px] text-slate-400 font-medium">Record daily overhead & operational bills.</p>
+                    </div>
+                </div>
+                <form id="expenseForm" class="space-y-3 text-xs font-semibold" onsubmit="submitExpense(event)">
+                    <select id="expCategory" class="w-full p-2.5 bg-slate-50 border rounded-xl font-semibold text-slate-700">
+                        <option value="Office Rent & Utilities">Office Rent & Utilities</option>
+                        <option value="Digital Marketing / Ads">Digital Marketing / Ads</option>
+                        <option value="Staff Salary & Bonus">Staff Salary & Bonus</option>
+                        <option value="Internet & Software">Internet & Software</option>
+                        <option value="Misc / Entertainment">Misc / Entertainment</option>
+                    </select>
+                    <input type="text" id="expDesc" required placeholder="Description (e.g. Keraniganj Office Rent / Facebook Ads)" class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="number" id="expAmount" required placeholder="Amount (BDT)" class="w-full p-2.5 bg-slate-50 border rounded-xl text-red-600 font-bold">
+                        <input type="date" id="expDate" required class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                    </div>
+                    <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold p-3 rounded-xl shadow-md">🧾 Record Expense</button>
+                </form>
+            </div>
+
+            <!-- Live Expense Ledger Table -->
+            <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden flex flex-col justify-between">
+                <div>
+                    <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                        <h3 class="font-bold text-slate-800 text-sm md:text-base">📉 Office Expenses Ledger</h3>
+                        <span class="bg-red-50 text-red-700 text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase">Editable Costs</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-slate-50 text-slate-400 font-bold text-[9px] uppercase border-b">
+                                    <th class="p-3">Category & Details</th>
+                                    <th class="p-3">Date</th>
+                                    <th class="p-3">Amount (BDT)</th>
+                                    <th class="p-3 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expenseTableBody" class="text-slate-700 divide-y divide-slate-100 font-medium">
+                                <tr><td colspan="4" class="p-4 text-center text-slate-400">Loading expenses...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="p-3 bg-slate-50 border-t text-[10px] text-slate-400 text-center font-semibold">Click "Edit" to adjust expense description or BDT amount.</div>
+            </div>
+
+        </div>
 
     </main>
     <footer class="text-center py-6 text-xs text-slate-400 border-t bg-white mt-12">&copy; 2026 Webbo Technology Travel ERP Framework.</footer>
