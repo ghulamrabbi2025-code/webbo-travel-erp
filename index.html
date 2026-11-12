@@ -626,6 +626,61 @@
             </div>
 
         </div>
+        <!-- Staff & HR Management Panel -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-2">
+            
+            <!-- Add New Employee Form -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 space-y-4">
+                <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
+                    <span class="text-xl">👔</span>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm md:text-base">Add New Staff / Consultant</h3>
+                        <p class="text-[10px] text-slate-400 font-medium">Create ERP login & payroll contract.</p>
+                    </div>
+                </div>
+                <form id="staffForm" class="space-y-3 text-xs font-semibold" onsubmit="submitEmployee(event)">
+                    <input type="text" id="empName" required placeholder="Full Name (e.g. Tariqul Islam)" class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="email" id="empEmail" required placeholder="Login Email" class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                        <input type="text" id="empPass" required placeholder="Initial Password" class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                    </div>
+                    <input type="text" id="empRole" required placeholder="Job Title (e.g. Visa Officer)" class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="number" id="empSalary" required placeholder="Base Salary (BDT)" class="w-full p-2.5 bg-slate-50 border rounded-xl text-slate-800 font-bold">
+                        <input type="number" step="0.1" id="empComm" required placeholder="Commission % (e.g. 15)" class="w-full p-2.5 bg-slate-50 border rounded-xl text-emerald-700 font-bold">
+                    </div>
+                    <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold p-3 rounded-xl shadow-md">➕ Hire Staff Member</button>
+                </form>
+            </div>
+
+            <!-- Live Staff Directory & Payroll Controls -->
+            <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden flex flex-col justify-between">
+                <div>
+                    <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                        <h3 class="font-bold text-slate-800 text-sm md:text-base">🏢 Staff Roster & Commission Contracts</h3>
+                        <span class="bg-slate-200 text-slate-700 text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase">HR Controls</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-slate-50 text-slate-400 font-bold text-[9px] uppercase border-b">
+                                    <th class="p-3">ID & Name</th>
+                                    <th class="p-3">Role & Login</th>
+                                    <th class="p-3">Base Salary</th>
+                                    <th class="p-3">Comm. %</th>
+                                    <th class="p-3 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="staffTableBody" class="text-slate-700 divide-y divide-slate-100 font-medium">
+                                <tr><td colspan="5" class="p-4 text-center text-slate-400">Loading staff roster...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="p-3 bg-slate-50 border-t text-[10px] text-slate-400 text-center font-semibold">Click "Edit" to change salary, commission rate, or reset a staff password.</div>
+            </div>
+
+        </div>
 
     </main>
     <footer class="text-center py-6 text-xs text-slate-400 border-t bg-white mt-12">&copy; 2026 Webbo Technology Travel ERP Framework.</footer>
