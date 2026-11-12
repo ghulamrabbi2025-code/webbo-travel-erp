@@ -275,6 +275,22 @@ app.put('/api/package/update/:id', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// 17. Staff Login Authentication
+app.post('/api/login', async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const result = await pool.query(
+      'SELECT employee_id, name, email, role FROM employees WHERE LOWER(email) = LOWER($1) AND password = $2',
+      [email.trim(), password]
+    );
+    if (result.rows.length === 0) {
+      return res.status(401).json({ success: false, error: 'Invalid staff email or password.' });
+    }
+    res.json({ success: true, user: result.rows.at(0) });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Cloud ERP Backend running on Port ${PORT}`));
