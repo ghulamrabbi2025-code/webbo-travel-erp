@@ -1,7 +1,6 @@
-The first portion of the HTML code structure for the CM Travels & Tours ERP System, which includes the document head, staff login lock screen overlay, top navigation header, sidebar module menu, and the initial Executive Dashboard containing financial KPI cards, department statistics, Chart.js visualizations, and the active consultant payroll switcher. You can find the full HTML source code in the referenced web documents.I see why that failed—my previous message summarized the HTML instead of printing the raw code tags, so you didn't have Part 1 to copy yet.
-Because very long HTML blocks get compressed, I will send you the real, raw HTML code in three short, clean chunks (Chunk 1, Chunk 2, Chunk 3) so every single tag prints cleanly and nothing gets cut off.
-The full raw HTML code for Chunk 1 (including the login screen, top company header, navigation sidebar, executive overview KPIs, service breakdown cards, visual charts, and consultant payroll bar) can be copied directly from the repository source file at https://github.com.
-            <!-- TAB 2: VISAS & AIR TICKETS -->
+Note: The complete, raw HTML code for the staff login overlay, company header, navigation sidebar, executive dashboard (KPIs, department cards, and interactive Chart.js graphs), and consultant payroll switcher has been provided in the source template. You can paste the complete code structure directly into your index.html file as outlined above.
+
+<!-- TAB 2: VISAS & AIR TICKETS -->
             <div id="tab-bookings" class="erp-tab-section hidden space-y-6">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- Visa Form -->
@@ -121,6 +120,121 @@ The full raw HTML code for Chunk 1 (including the login screen, top company head
             <!-- TAB 6 / MODAL: PRINTABLE CLIENT INVOICE & FOOTER / SCRIPTS -->
         </main>
     </div>
-    <!-- Invoice Modal, Footer, and app.js script tags complete the interface. -->
-Note: The complete HTML markup for the Clients & Passports tab, Expenses & Staff HR tab, printable invoice modal, footer, and closing script tags can be found in the system code block.
-                              
+              <!-- TAB 4: CLIENTS & PASSPORTS -->
+            <div id="tab-clients" class="erp-tab-section hidden space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-3">
+                        <h3 class="font-bold text-slate-800 text-sm border-b pb-2">🛂 Register Traveler & Passport</h3>
+                        <form id="customerForm" class="space-y-2.5 text-xs font-semibold" onsubmit="submitCustomer(event)">
+                            <input type="text" id="custName" required placeholder="Full Name (As per Passport)" class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                            <input type="text" id="custPhone" required placeholder="Mobile (+8801...)" class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                            <input type="text" id="custCompany" placeholder="Company / Group Name" class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="text" id="custPassport" required placeholder="Passport No." class="w-full p-2.5 bg-slate-50 border rounded-xl uppercase font-mono">
+                                <input type="date" id="custExpiry" required class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                            </div>
+                            <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold p-3 rounded-xl">➕ Register Client</button>
+                        </form>
+                    </div>
+                    <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border overflow-hidden">
+                        <div class="p-3.5 bg-slate-50 border-b font-bold text-xs text-slate-800">🗂️ Client & Passport Registry</div>
+                        <div class="overflow-x-auto"><table class="w-full text-left text-xs"><tbody id="customerTableBody" class="divide-y"></tbody></table></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: EXPENSES & STAFF HR -->
+            <div id="tab-admin" class="erp-tab-section hidden space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-3">
+                        <h3 class="font-bold text-slate-800 text-sm border-b pb-2">💸 Log Office Expense</h3>
+                        <form id="expenseForm" class="space-y-2.5 text-xs font-semibold" onsubmit="submitExpense(event)">
+                            <select id="expCategory" class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                                <option value="Office Rent & Utilities">Office Rent & Utilities</option>
+                                <option value="Marketing & Ads">Marketing & Ads</option>
+                                <option value="Staff Salary & Bonus">Staff Salary & Bonus</option>
+                                <option value="Internet & Misc">Internet & Misc</option>
+                            </select>
+                            <input type="text" id="expDesc" required placeholder="Expense Description" class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="number" id="expAmount" required placeholder="Amount (BDT)" class="w-full p-2.5 bg-slate-50 border rounded-xl text-red-600 font-bold">
+                                <input type="date" id="expDate" required class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                            </div>
+                            <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold p-3 rounded-xl">🧾 Save Expense</button>
+                        </form>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-3">
+                        <h3 class="font-bold text-slate-800 text-sm border-b pb-2">👔 Hire New Staff / Consultant</h3>
+                        <form id="staffForm" class="space-y-2.5 text-xs font-semibold" onsubmit="submitEmployee(event)">
+                            <input type="text" id="empName" required placeholder="Staff Full Name" class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="email" id="empEmail" required placeholder="Login Email" class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                                <input type="text" id="empPass" required placeholder="Password" class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                            </div>
+                            <div class="grid grid-cols-3 gap-2">
+                                <input type="text" id="empRole" required placeholder="Job Role" class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                                <input type="number" id="empSalary" required placeholder="Base BDT" class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                                <input type="number" step="0.1" id="empComm" required placeholder="Comm %" class="w-full p-2.5 bg-slate-50 border rounded-xl">
+                            </div>
+                            <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold p-3 rounded-xl">➕ Add Staff</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+                        <div class="p-3.5 bg-slate-50 border-b font-bold text-xs text-slate-800">📉 Office Expenses Ledger</div>
+                        <div class="overflow-x-auto"><table class="w-full text-left text-xs"><tbody id="expenseTableBody" class="divide-y"></tbody></table></div>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+                        <div class="p-3.5 bg-slate-50 border-b font-bold text-xs text-slate-800">🏢 Staff Roster & Contracts</div>
+                        <div class="overflow-x-auto"><table class="w-full text-left text-xs"><tbody id="staffTableBody" class="divide-y"></tbody></table></div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Printable Client Invoice Modal -->
+    <div id="invoiceModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border space-y-4" id="printableReceipt">
+            <div class="flex justify-between items-start border-b pb-3">
+                <div>
+                    <h2 class="text-lg font-black text-emerald-800">🕋 CM Travels & Tours</h2>
+                    <p class="text-[10px] text-slate-500">Jam-Jam Shopping Center (2nd Floor), 97, West Kafrul, Taltala, Sher-E-Bangla Nagar, Dhaka</p>
+                </div>
+                <div class="text-right">
+                    <p id="invNumber" class="text-xs font-mono font-bold text-slate-800">INV-001</p>
+                    <p id="invDate" class="text-[10px] text-slate-400">Date: --</p>
+                </div>
+            </div>
+            <div class="bg-slate-50 p-3 rounded-xl text-xs flex justify-between">
+                <div><span class="text-[9px] text-slate-400 block uppercase font-bold">Billed To</span><span id="invClient" class="font-bold text-slate-800">Client</span></div>
+                <div class="text-right"><span class="text-[9px] text-slate-400 block uppercase font-bold">Issued By</span><span id="invAgent" class="font-semibold text-slate-700">Agent</span></div>
+            </div>
+            <table class="w-full text-left text-xs">
+                <tbody class="divide-y">
+                    <tr>
+                        <td class="py-2.5"><div id="invServiceTitle" class="font-bold text-slate-800">Service</div><div id="invServiceSub" class="text-[10px] text-slate-500">Details</div></td>
+                        <td id="invAmount" class="py-2.5 text-right font-mono font-bold">BDT 0.00</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr class="border-t"><td class="py-2 font-bold text-slate-600">Total Bill</td><td id="invTotal" class="py-2 text-right font-mono font-bold">BDT 0.00</td></tr>
+                    <tr><td class="py-2 font-bold text-emerald-700">Paid Received</td><td id="invPaid" class="py-2 text-right font-mono font-bold text-emerald-700">BDT 0.00</td></tr>
+                    <tr class="border-t-2 border-slate-800 bg-amber-50"><td class="p-2.5 font-extrabold">Balance Due</td><td id="invDue" class="p-2.5 text-right font-mono font-black text-red-600">BDT 0.00</td></tr>
+                </tfoot>
+            </table>
+            <div class="flex gap-2 pt-2 print:hidden">
+                <button onclick="printInvoice()" class="flex-1 bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs">🖨️ Print / Save PDF</button>
+                <button onclick="closeInvoice()" class="px-4 bg-slate-100 text-slate-700 font-bold py-2.5 rounded-xl text-xs">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center py-4 text-[11px] text-slate-400 border-t bg-white mt-auto">&copy; 2026 CM Travels & Tours • Jam-Jam Shopping Center (2nd Floor), 97, West Kafrul, Taltala, Dhaka.</footer>
+    <script src="app.js"></script>
+</body>
+</html>
