@@ -458,13 +458,15 @@ loadHotels();
 loadPackages();
 loadExpenses();
 }
-function initProtectedDashboard(agentId) {
-document.getElementById('loginOverlay').classList.add('hidden');
-currentAgentId = agentId;
-loadEmployees();
-loadCustomers();
-refreshAll();
+function startOpenDashboard(agentId) {
+    currentAgentId = agentId;
+    loadEmployees();
+    loadCustomers();
+    refreshAll();
 }
+
+startOpenDashboard(1);
+
 async function handleLogin(e) {
 e.preventDefault();
 const errBox = document.getElementById('loginError');
