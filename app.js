@@ -41,44 +41,8 @@ async function loadDashboardStats() {
 
         document.getElementById('statPkgCount').innerText = d.packages.count + ' Packages';
         document.getElementById('statPkgAmt').innerText = fmt(d.packages.amount);
-
-        renderCharts(d);
-    } catch (err) { console.error("Dashboard stats error:", err); }
+           } catch (err) { console.error("Dashboard stats error:", err); }
 }
-
-function renderCharts(d) {
-    if (typeof Chart === 'undefined') return;
-
-    const ctx1 = document.getElementById('revenueBarChart');
-    if (ctx1) {
-        if (revenueChartInstance) revenueChartInstance.destroy();
-        revenueChartInstance = new Chart(ctx1, {
-            type: 'bar',
-            data: {
-                labels: ['Visas', 'Air Tickets', 'Hotels', 'Tour Packages'],
-                datasets: [
-                    { label: 'Total Sales (BDT)', data: [d.visas.amount, d.tickets.amount, d.hotels.amount, d.packages.amount], backgroundColor: ['#10b981', '#3b82f6', '#6366f1', '#14b8a6'], borderRadius: 8 },
-                    { label: 'Net Profit Margin (BDT)', data: [d.visas.profit, d.tickets.profit, d.hotels.profit, d.packages.profit], backgroundColor: ['#047857', '#1d4ed8', '#4338ca', '#0f766e'], borderRadius: 8 }
-                ]
-            },
-            options: { responsive: true, maintainAspectRatio: false }
-        });
-    }
-
-    const ctx2 = document.getElementById('serviceDoughnutChart');
-    if (ctx2) {
-        if (serviceChartInstance) serviceChartInstance.destroy();
-        serviceChartInstance = new Chart(ctx2, {
-            type: 'doughnut',
-            data: {
-                labels: ['Visa Processing', 'Air Ticketing', 'Hotel Bookings', 'Tour & Umrah Packages'],
-                datasets: [{ data: [d.visas.count || 0, d.tickets.count || 0, d.hotels.count || 0, d.packages.count || 0], backgroundColor: ['#10b981', '#3b82f6', '#6366f1', '#f59e0b'], borderWidth: 2 }]
-            },
-            options: { responsive: true, maintainAspectRatio: false }
-        });
-    }
-}
-
 async function loadAgentData(id) {
     currentAgentId = id;
     try {
@@ -430,7 +394,6 @@ w.document.close();
 }
 function refreshAll() {
 loadDashboardStats();
-loadAgentData(currentAgentId);
 loadVisas();
 loadTickets();
 loadHotels();
