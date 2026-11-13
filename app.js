@@ -9,11 +9,11 @@ function switchTab(tabId) {
     if (target) target.classList.remove('hidden');
 
     document.querySelectorAll('.nav-tab-btn').forEach(btn => {
-        btn.className = "nav-tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold text-emerald-100 hover:bg-white/10 transition-all text-left";
+        btn.className = "nav-tab-btn px-3.5 py-2 rounded-full text-xs font-medium text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 transition-all cursor-pointer";
     });
     const activeBtn = document.getElementById('btn-' + tabId);
     if (activeBtn) {
-        activeBtn.className = "nav-tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold bg-white text-emerald-950 shadow-md transition-all text-left";
+        activeBtn.className = "nav-tab-btn px-4 py-2 rounded-full text-xs font-semibold bg-zinc-900 text-white shadow-sm transition-all cursor-pointer";
     }
 }
 
