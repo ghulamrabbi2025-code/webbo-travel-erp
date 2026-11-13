@@ -247,39 +247,32 @@ await pool.query("UPDATE " + t.at(0) + " SET amount_paid=$1 WHERE " + t.at(1) + 
 res.json({ success: true });
 } catch (err) { res.status(500).json({ error: err.message }); }
 });
-app.post('/api/login', async (req, res) => {
-const { email, password } = req.body;
-try {
-const r = await pool.query("SELECT employee_id, name, email, role FROM employees WHERE LOWER(email)=LOWER($1) AND password=$2", [email.trim(), password]);
-if (r.rows.length === 0) return res.status(401).json({ success: false, error: 'Invalid credentials' });
-res.json({ success: true, user: r.rows.at(0) });
-} catch (err) { res.status(500).json({ success: false, error: err.message }); }
+app.post('/api/employee/add', async (req, res) => {
+  const { name, email, role, baseSalary, commissionRate } = req.body;
+  try {
+    const r = await pool.query(
+      "INSERT INTO employees (name, email, role, base_salary, commission_rate) VALUES ($1,$2,$3,$4,$5) RETURNING employee_id, name",
+      [name, email.trim(), role, parseFloat(baseSalary), parseFloat(commissionRate)]
+    );
+    res.status(201).json({ success: true, employee: r.rows.at(0) });
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
+
+app.put('/api/employee/update/:id', async (req, res) => {
+  const { name, role, baseSalary, commissionRate } = req.body;
+  try {
+    await pool.query(
+      "UPDATE employees SET name=$1, role=$2, base_salary=$3, commission_rate=$4 WHERE employee_id=$5",
+      [name, role, parseFloat(baseSalary), parseFloat(commissionRate), parseInt(req.params.id, 10)]
+    );
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 app.get('/api/employees', async (req, res) => {
 try {
 const r = await pool.query("SELECT employee_id, name, email, role, base_salary, commission_rate FROM employees ORDER BY employee_id ASC");
 res.json(r.rows);
-} catch (err) { res.status(500).json({ error: err.message }); }
-});
-app.post('/api/employee/add', async (req, res) => {
-const { name, email, role, baseSalary, commissionRate, password } = req.body;
-try {
-const r = await pool.query("INSERT INTO employees (name, email, role, base_salary, commission_rate, password) VALUES ($1,$2,$3,$4,$5,$6) RETURNING employee_id, name",
-[name, email.trim(), role, parseFloat(baseSalary), parseFloat(commissionRate), password || 'cm2026']);
-res.status(201).json({ success: true, employee: r.rows.at(0) });
-} catch (err) { res.status(500).json({ error: err.message }); }
-});
-app.put('/api/employee/update/:id', async (req, res) => {
-const { name, role, baseSalary, commissionRate, newPassword } = req.body;
-try {
-if (newPassword && newPassword.trim() !== '') {
-await pool.query("UPDATE employees SET name=$1, role=$2, base_salary=$3, commission_rate=$4, password=$5 WHERE employee_id=$6",
-[name, role, parseFloat(baseSalary), parseFloat(commissionRate), newPassword.trim(), parseInt(req.params.id, 10)]);
-} else {
-await pool.query("UPDATE employees SET name=$1, role=$2, base_salary=$3, commission_rate=$4 WHERE employee_id=$5",
-[name, role, parseFloat(baseSalary), parseFloat(commissionRate), parseInt(req.params.id, 10)]);
-}
-res.json({ success: true });
 } catch (err) { res.status(500).json({ error: err.message }); }
 });
 app.get('/', (req, res) => res.status(200).send('CM Travels & Tours ERP Backend Live!'));
