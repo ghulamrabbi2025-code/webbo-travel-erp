@@ -2,6 +2,67 @@ The raw HTML structures needed to restore the visual design, login lock screen, 
 To apply them:
 • Block 1: Inserts the document setup, Tailwind CSS styling, Chart.js integration, login overlay, corporate header for CM Travels & Tours in Dhaka, and the emerald dark mode left navigation sidebar.
 • Block 2: Adds the financial KPI summary cards, department metrics for visas, air tickets, hotels, and Umrah packages, the interactive charts, and the consultant payroll ledger.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CM Travels & Tours Dashboard</title>
+    <!-- This line adds all the colors, shadows, and modern styling -->
+    <script src="https://tailwindcss.com"></script>
+    <script src="https://jsdelivr.net"></script>
+</head>
+<body class="bg-slate-100 text-slate-800">
+
+    <!-- Stylish Top Header -->
+    <header class="bg-emerald-900 text-white p-4 shadow-lg flex justify-between items-center">
+        <div>
+            <h1 class="text-xl font-bold">🕋 CM Travels & Tours ERP</h1>
+            <p class="text-xs text-emerald-200">Jam-Jam Shopping Center (2nd Floor), West Kafrul, Dhaka</p>
+        </div>
+        <span class="bg-emerald-700 px-3 py-1 rounded-full text-xs font-bold">🟢 Cloud Live</span>
+    </header>
+
+    <!-- Main Layout: Left Sidebar + Right Content -->
+    <div class="flex min-h-screen">
+        
+        <!-- Dark Left Sidebar -->
+        <aside class="w-60 bg-emerald-950 text-white p-4 space-y-2">
+            <button onclick="switchTab('tab-overview')" id="btn-tab-overview" class="nav-tab-btn w-full text-left px-4 py-3 rounded-xl text-xs font-bold bg-white text-emerald-950">📊 Dashboard Overview</button>
+            <button onclick="switchTab('tab-bookings')" id="btn-tab-bookings" class="nav-tab-btn w-full text-left px-4 py-3 rounded-xl text-xs font-semibold text-emerald-100 hover:bg-white/10">🛂 Visas & Air Tickets</button>
+            <button onclick="switchTab('tab-hotels')" id="btn-tab-hotels" class="nav-tab-btn w-full text-left px-4 py-3 rounded-xl text-xs font-semibold text-emerald-100 hover:bg-white/10">🏨 Hotels & Packages</button>
+            <button onclick="switchTab('tab-clients')" id="btn-tab-clients" class="nav-tab-btn w-full text-left px-4 py-3 rounded-xl text-xs font-semibold text-emerald-100 hover:bg-white/10">🗂️ Clients & Passports</button>
+            <button onclick="switchTab('tab-admin')" id="btn-tab-admin" class="nav-tab-btn w-full text-left px-4 py-3 rounded-xl text-xs font-semibold text-emerald-100 hover:bg-white/10">💸 Expenses & HR</button>
+        </aside>
+
+        <!-- Right Workspace -->
+        <main class="flex-1 p-6 space-y-6">
+            
+            <!-- Colorful KPI Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-2xl shadow border-l-4 border-emerald-500">
+                    <p class="text-xs font-bold text-slate-400 uppercase">Total Sales</p>
+                    <h2 id="kpiTotalSales" class="text-xl font-black text-slate-800 mt-1">BDT 0.00</h2>
+                </div>
+                <div class="bg-white p-5 rounded-2xl shadow border-l-4 border-blue-500">
+                    <p class="text-xs font-bold text-slate-400 uppercase">Operating Profit</p>
+                    <h2 id="kpiOpProfit" class="text-xl font-black text-blue-700 mt-1">BDT 0.00</h2>
+                </div>
+                <div class="bg-white p-5 rounded-2xl shadow border-l-4 border-amber-500">
+                    <p class="text-xs font-bold text-slate-400 uppercase">Customer Due</p>
+                    <h2 id="kpiCustDue" class="text-xl font-black text-amber-600 mt-1">BDT 0.00</h2>
+                </div>
+                <div class="bg-white p-5 rounded-2xl shadow border-l-4 border-red-500">
+                    <p class="text-xs font-bold text-slate-400 uppercase">Last Month Expenses</p>
+                    <h2 id="kpiLastMonthExp" class="text-xl font-black text-red-600 mt-1">BDT 0.00</h2>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+</body>
+</html>
+
 <!-- TAB 2: VISAS & AIR TICKETS -->
             <div id="tab-bookings" class="erp-tab-section hidden space-y-6">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
