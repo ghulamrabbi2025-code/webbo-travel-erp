@@ -121,3 +121,193 @@
             </div>
 
         </div>
+        <!-- TAB 2: VISAS & AIR TICKETS -->
+        <div id="tab-bookings" class="erp-tab-section hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                <div class="bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-sm space-y-3">
+                    <h3 class="font-semibold text-zinc-900 text-sm border-b border-zinc-100 pb-2">🛂 Log Tourist & Umrah Visas</h3>
+                    <form id="visaForm" class="space-y-2.5 text-xs" onsubmit="submitVisa(event)">
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="number" id="visaCustId" required value="1" placeholder="Customer ID" class="w-full p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl">
+                            <input type="text" id="visaCountry" required value="Saudi Arabia" placeholder="Country" class="w-full p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl">
+                        </div>
+                        <input type="text" id="visaType" required value="Umrah Visa" placeholder="Visa Subcategory" class="w-full p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl">
+                        <div class="grid grid-cols-3 gap-2">
+                            <input type="number" id="visaCost" required placeholder="Net Cost" class="w-full p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-rose-600 font-semibold">
+                            <input type="number" id="visaPrice" required placeholder="Selling Price" class="w-full p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-emerald-600 font-semibold">
+                            <input type="number" id="visaPaid" placeholder="Paid Now" class="w-full p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl font-semibold">
+                        </div>
+                        <button type="submit" class="w-full bg-zinc-900 hover:bg-zinc-800 text-white font-medium p-3 rounded-xl">Save Visa Entry</button>
+                    </form>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-sm space-y-3">
+                    <h3 class="font-semibold text-zinc-900 text-sm border-b border-zinc-100 pb-2">✈️ Log Flight Ticket PNR</h3>
+                    <form id="ticketForm" class="space-y-2.5 text-xs" onsubmit="submitTicket(event)">
+                        <div class="grid grid-cols-3 gap-2">
+                            <input type="number" id="ticketCustId" required value="1" placeholder="Client ID" class="w-full p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl">
+                            <input type="text" id="gdsPnr" required placeholder="GDS PNR" class="w-full p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl uppercase">
+                            <input type="text" id="airlineCode" required placeholder="Airline" class="w-full p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl uppercase">
+                        </div>
+                        <input type="text" id="route" required placeholder="Route (e.g. DAC-DXB-JED)" class="w-full p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl uppercase">
+                        <div class="grid grid-cols-3 gap-2">
+                            <input type="number" id="ticketCost" required placeholder="Net Cost" class="w-full p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-rose-600 font-semibold">
+                            <input type="number" id="ticketPrice" required placeholder="Selling Price" class="w-full p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-emerald-600 font-semibold">
+                            <input type="number" id="ticketPaid" placeholder="Paid Now" class="w-full p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl font-semibold">
+                        </div>
+                        <button type="submit" class="w-full bg-zinc-900 hover:bg-zinc-800 text-white font-medium p-3 rounded-xl">Log Ticket PNR</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                <div class="bg-white rounded-2xl border border-zinc-200/80 shadow-sm overflow-hidden">
+                    <div class="p-3.5 bg-zinc-50/70 border-b border-zinc-100 font-semibold text-xs text-zinc-800">Visa Processing Ledger</div>
+                    <div class="overflow-x-auto"><table class="w-full text-left text-xs"><tbody id="visaTableBody" class="divide-y divide-zinc-100"></tbody></table></div>
+                </div>
+                <div class="bg-white rounded-2xl border border-zinc-200/80 shadow-sm overflow-hidden">
+                    <div class="p-3.5 bg-zinc-50/70 border-b border-zinc-100 font-semibold text-xs text-zinc-800">Air Ticketing PNR Ledger</div>
+                    <div class="overflow-x-auto"><table class="w-full text-left text-xs"><tbody id="ticketTableBody" class="divide-y divide-zinc-100"></tbody></table></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: HOTELS & PACKAGES -->
+        <div id="tab-hotels" class="erp-tab-section hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                <div class="bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-sm space-y-3">
+                    <h3 class="font-semibold text-zinc-900 text-sm border-b border-zinc-100 pb-2">🏨 Worldwide Hotel Booking</h3>
+                    <form id="hotelForm" class="space-y-2.5 text-xs" onsubmit="submitHotel(event)">
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="number" id="hotelCustId" required value="1" placeholder="Client ID" class="w-full p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl">
+                            <input type="text" id="hotelCity" required placeholder="City / Country" class="w-full p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="text" id="hotelName" required placeholder="Hotel Name" class="w-full p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl">
+                            <input type="text" id="hotelRoom" required placeholder="Room Type" class="w-full p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="date" id="hotelCheckIn" required class="w-full p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl">
+                            <input type="date" id="hotelCheckOut" required class="w-full p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl">
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <input type="number" id="hotelCost" required placeholder="Net Cost" class="w-full p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-rose-600 font-semibold">
+                            <input type="number" id="hotelPrice" required placeholder="Selling Price" class="w-full p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-emerald-600 font-semibold">
+                            <input type="number" id="hotelPaid" placeholder="Paid Now" class="w-full p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl font-semibold">
+                        </div>
+                        <button type="submit" class="w-full bg-zinc-900 hover:bg-zinc-800 text-white font-medium p-3 rounded-xl">Save Hotel Booking</button>
+                    </form>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-sm space-y-3">
+                    <h3 class="font-semibold text-zinc-900 text-sm border-b border-zinc-100 pb-2">🧳 Tour & Hajj/Umrah Package Builder</h3>
+                    <form id="packageForm" class="space-y-2.5 text-xs" onsubmit="submitPackage(event)">
+                        <div class="grid grid-cols-3 gap-2">
+                            <input type="number" id="pkgCustId" required value="1" placeholder="Client ID" class="w-full p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl">
+                            <select id="pkgCategory" class="w-full p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl">
+                                <option value="Umrah Package">Umrah Package</option>
+                                <option value="Hajj Package">Hajj Package</option>
+                                <option value="International Tour">International Tour</option>
+                                <option value="Domestic Tour">Domestic Tour</option>
+                            </select>
+                            <input type="number" id="pkgPax" required value="2" placeholder="Pax" class="w-full p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="text" id="pkgName" required placeholder="Package Title" class="w-full p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl">
+                            <input type="text" id="pkgDest" required placeholder="Destination" class="w-full p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="date" id="pkgDate" required class="w-full p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl">
+                            <input type="text" id="pkgServices" required placeholder="Services (Flight+Hotel+Visa)" class="w-full p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl">
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <input type="number" id="pkgCost" required placeholder="Net Cost" class="w-full p-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-rose-600 font-semibold">
+Save Package
+
+
+Global Hotel Bookings Ledger
+
+
+
+Tour & Umrah Packages Ledger
+
+
+
+🛂 Register Traveler & Passport
+
+
+
+
+
+
+
+
+Register Client
+
+
+
+Client & Passport Registry
+
+
+
+💸 Log Office Expense
+
+
+Office Rent & Utilities
+Marketing & Ads
+Staff Salary & Bonus
+Internet & Misc
+
+
+
+
+
+
+Save Expense
+
+👔 Hire New Staff / Consultant
+
+
+
+
+
+
+
+
+
+
+
+Add Staff
+
+
+Office Expenses Ledger
+
+
+
+Staff Roster & Contracts
+
+
+
+📊 Overview
+🛂 Visas & Tickets
+🏨 Hotels & Packages
+🗂️ Clients
+💸 Expenses & HR
+🕋 CM Travels & Tours
+Jam-Jam Shopping Center (2nd Floor), 97, West Kafrul, Taltala, Sher-E-Bangla Nagar, Dhaka
+
+
+INV-001
+Date: --
+
+
+
+Billed ToClient
+Issued ByAgent
+
+	BDT 0.00
+
+🖨️ Print / Save PDF
+Close
+
+
