@@ -7,40 +7,6 @@
     <script src="https://tailwindcss.com"></script>
     <script src="https://jsdelivr.net"></script>
 </head>
-<body class="bg-[#E5E7EB] text-zinc-800 min-h-screen pb-28 antialiased">
-
-    <div id="loginOverlay" class="fixed inset-0 bg-zinc-900/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-xl border border-zinc-200 space-y-6">
-            <div class="text-center space-y-1">
-                <div class="text-3xl">🕋</div>
-                <h2 class="text-xl font-bold text-zinc-900">CM Travels & Tours</h2>
-                <p class="text-xs text-zinc-500">Jam-Jam Shopping Center (2nd Floor), West Kafrul, Dhaka</p>
-            </div>
-            <form id="loginForm" class="space-y-4 text-xs" onsubmit="handleLogin(event)">
-                <input type="email" id="loginEmail" required placeholder="Staff Email (e.g. mahbub@agency.com)" class="w-full p-3.5 bg-zinc-50 border border-zinc-200 rounded-xl">
-                <input type="password" id="loginPassword" required placeholder="Security Password" class="w-full p-3.5 bg-zinc-50 border border-zinc-200 rounded-xl">
-                <p id="loginError" class="hidden text-red-600 bg-red-50 p-2.5 rounded-xl text-center font-medium"></p>
-                <button type="submit" class="w-full bg-zinc-900 hover:bg-zinc-800 text-white font-semibold p-3.5 rounded-xl shadow">Sign In to Workspace</button>
-            </form>
-        </div>
-    </div>
-
-    <header class="bg-zinc-900 text-white border-b border-zinc-800 sticky top-0 z-30 shadow-md">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
-            <div>
-                <div class="flex items-center gap-2.5">
-                    <span class="text-lg">🕋</span>
-                    <h1 class="text-base md:text-lg font-bold text-white tracking-tight">CM Travels & Tours ERP System</h1>
-                    <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-semibold px-2.5 py-0.5 rounded-full">Cloud Live</span>
-                </div>
-                <p class="text-[11px] text-zinc-400 mt-0.5">Jam-Jam Shopping Center (2nd Floor), 97, West Kafrul, Taltala, Sher-E-Bangla Nagar, Dhaka, Bangladesh</p>
-            </div>
-            <a href="javascript:void(0)" onclick="logoutUser()" class="text-xs font-medium text-zinc-300 hover:text-rose-400 transition-colors">Sign Out →</a>
-        </div>
-    </header>
-
-    <main class="max-w-7xl mx-auto px-4 md:px-6 pt-6 space-y-6">
-
         <!-- TAB 1: EXECUTIVE DASHBOARD -->
         <div id="tab-overview" class="erp-tab-section space-y-6">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -112,6 +78,19 @@
                 </div>
             </div>
         </div>
+<body class="bg-[#F4F5F7] text-zinc-800 min-h-screen pb-24 antialiased">
+
+    <header class="bg-white/90 backdrop-blur-md border-b border-zinc-200/80 sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-6 py-3.5 flex justify-between items-center">
+            <div class="flex items-center gap-2.5">
+                <span class="text-lg">🕋</span>
+                <h1 class="text-base font-bold text-zinc-900 tracking-tight">CM Travels & Tours ERP</h1>
+            </div>
+            <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-semibold px-2.5 py-0.5 rounded-full">Live</span>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 md:px-6 pt-6 space-y-6">
 
         <!-- TAB 2: VISAS & AIR TICKETS -->
         <div id="tab-bookings" class="erp-tab-section hidden space-y-6">
