@@ -61,18 +61,21 @@ async function loadAgentData(id) {
         console.error("Payroll fetch error:", err);
     }
 }
-
 async function loadEmployees() {
+    const switcher = document.getElementById('staffSwitcherBar');
+    if (switcher) switcher.innerHTML = '<span class="text-xs text-zinc-400">Fetching staff names...</span>';
     try {
         const res = await fetch(`${API_BASE_URL}/api/employees`);
         const employees = await res.json();
-        const switcher = document.getElementById('staffSwitcherBar');
-        if (switcher && employees.length > 0) {
-            switcher.innerHTML = employees.map(emp => {
-                const isActive = emp.employee_id === currentAgentId;
-                const cls = isActive ? "px-3.5 py-2 bg-zinc-900 text-white rounded-lg text-xs font-bold shadow cursor-pointer" : "px-3.5 py-2 bg-zinc-100 text-zinc-700 rounded-lg text-xs font-semibold hover:bg-zinc-200 cursor-pointer";
-                return `<button onclick="switchAgent(${emp.employee_id})" class="${cls}">${emp.name} (ID: ${emp.employee_id})</button>`;
-            }).join('');
+        if (switcher) {
+            switcher.innerHTML = employees.length > 0
+                ? employees.map(emp => {
+                    const cls = emp.employee_id === currentAgentId
+                        ? "px-3.5 py-2 bg-zinc-900 text-white rounded-lg text-xs font-bold shadow cursor-pointer"
+                        : "px-3.5 py-2 bg-zinc-100 text-zinc-700 rounded-lg text-xs font-semibold hover:bg-zinc-200 cursor-pointer";
+                    return `<button onclick="switchAgent(${emp.employee_id})" class="${cls}">${emp.name}</button>`;
+                }).join('')
+                : '<span class="text-xs text-rose-500">No staff found. Add staff in Expenses & HR tab.</span>';
         }
 
         const tbody = document.getElementById('staffTableBody');
@@ -468,6 +471,5 @@ loadExpenses();
 }
 currentAgentId = 1;
 loadEmployees();
-loadAgentData(1);
 loadCustomers();
 refreshAll();
