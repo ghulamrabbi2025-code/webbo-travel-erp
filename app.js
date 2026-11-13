@@ -1,7 +1,5 @@
 const API_BASE_URL = "https://onrender.com";
 let currentAgentId = 1;
-let revenueChartInstance = null;
-let serviceChartInstance = null;
 
 function switchTab(tabId) {
     document.querySelectorAll('.erp-tab-section').forEach(sec => sec.classList.add('hidden'));
@@ -41,8 +39,11 @@ async function loadDashboardStats() {
 
         document.getElementById('statPkgCount').innerText = d.packages.count + ' Packages';
         document.getElementById('statPkgAmt').innerText = fmt(d.packages.amount);
-           } catch (err) { console.error("Dashboard stats error:", err); }
+    } catch (err) {
+        console.error("Dashboard stats error:", err);
+    }
 }
+
 async function loadAgentData(id) {
     currentAgentId = id;
     try {
@@ -56,7 +57,9 @@ async function loadAgentData(id) {
             document.getElementById('cardCommEarned').innerText = 'BDT ' + data.commissionEarned.toLocaleString('en-IN', { minimumFractionDigits: 2 });
             document.getElementById('netPayout').innerText = 'BDT ' + data.netPayout.toLocaleString('en-IN', { minimumFractionDigits: 2 });
         }
-    } catch (err) { console.error("Payroll fetch error:", err); }
+    } catch (err) {
+        console.error("Payroll fetch error:", err);
+    }
 }
 
 async function loadEmployees() {
@@ -86,10 +89,15 @@ async function loadEmployees() {
                 </tr>
             `).join('');
         }
-    } catch (err) { console.error(err); }
+    } catch (err) {
+        console.error("Employee list error:", err);
+    }
 }
 
-function switchAgent(id) { loadAgentData(id); loadEmployees(); }
+function switchAgent(id) {
+    loadAgentData(id);
+    loadEmployees();
+}
 
 async function submitEmployee(e) {
     e.preventDefault();
@@ -101,7 +109,11 @@ async function submitEmployee(e) {
         commissionRate: document.getElementById('empComm').value
     };
     const res = await fetch(`${API_BASE_URL}/api/employee/add`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-    if ((await res.json()).success) { alert("✅ New staff hired!"); e.target.reset(); loadEmployees(); }
+    if ((await res.json()).success) {
+        alert("✅ New staff hired!");
+        e.target.reset();
+        loadEmployees();
+    }
 }
 
 async function editEmployee(id, oldName, oldRole, oldSal, oldComm) {
@@ -110,7 +122,11 @@ async function editEmployee(id, oldName, oldRole, oldSal, oldComm) {
     const baseSalary = prompt("Base Salary (BDT):", oldSal);
     const commissionRate = prompt("Commission %:", oldComm);
     const res = await fetch(`${API_BASE_URL}/api/employee/update/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, role, baseSalary, commissionRate }) });
-    if ((await res.json()).success) { alert("✅ Staff updated!"); loadEmployees(); loadAgentData(currentAgentId); }
+    if ((await res.json()).success) {
+        alert("✅ Staff updated!");
+        loadEmployees();
+        if (currentAgentId === id) loadAgentData(id);
+    }
 }
 
 async function submitVisa(e) {
@@ -125,7 +141,11 @@ async function submitVisa(e) {
         amountPaid: document.getElementById('visaPaid').value
     };
     const res = await fetch(`${API_BASE_URL}/api/visa/submit`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-    if ((await res.json()).success) { alert("💾 Visa entry saved!"); document.getElementById('visaPaid').value = ''; refreshAll(); }
+    if ((await res.json()).success) {
+        alert("💾 Visa entry saved!");
+        document.getElementById('visaPaid').value = '';
+        refreshAll();
+    }
 }
 
 async function loadVisas() {
@@ -139,21 +159,27 @@ async function loadVisas() {
         const badge = due > 0 ? `<span class="block text-[10px] font-bold text-rose-600">Due: BDT ${due.toLocaleString()}</span>` : `<span class="block text-[10px] font-bold text-emerald-600">✓ Full Paid</span>`;
         const payBtn = due > 0 ? `<button onclick="collectPayment('visa', ${v.visa_booking_id}, ${paid}, ${v.selling_price})" class="px-2 py-1 bg-amber-100 text-amber-800 rounded text-[11px] font-bold">💵 Pay</button>` : '';
         return `<tr class="hover:bg-zinc-50">
-${v.country}${v.visa_type}
-${v.customer_name || 'ID #' + v.customer_id}
-• BDT \(parseFloat(v.margin_{e}arned).toLocaleString()\){badge}
-${payBtn}
-`;
-}).join('') : 'No visas logged yet.';
+            <td class="p-3"><div class="font-bold text-zinc-800">${v.country}</div><div class="text-[10px] text-emerald-600 font-bold">${v.visa_type}</div></td>
+            <td class="p-3 text-zinc-600">${v.customer_name || 'ID #' + v.customer_id}</td>
+            <td class="p-3 font-mono font-bold text-emerald-700">+ BDT ${parseFloat(v.margin_earned).toLocaleString()}${badge}</td>
+            <td class="p-3 text-right space-x-1">${payBtn}
+                <button onclick="openInvoice('VIS-${v.visa_booking_id}', '${v.customer_name || 'Client #' + v.customer_id}', '${v.country} Visa (${v.visa_type})', 'Status: ${v.tracking_status || 'Submitted'}', ${v.selling_price}, ${paid})" class="px-2 py-1 bg-zinc-800 text-white rounded text-[11px] font-bold">🖨️ Invoice</button>
+                <button onclick="editVisa(${v.visa_booking_id}, '${v.country}', '${v.visa_type}', '${v.tracking_status || 'Submitted'}', ${v.supplier_cost}, ${v.selling_price})" class="px-2 py-1 bg-zinc-100 text-zinc-700 rounded text-[11px] font-bold">✏️ Edit</button>
+            </td></tr>`;
+    }).join('') : '<tr><td colspan="4" class="p-4 text-center text-zinc-400">No visas logged yet.</td></tr>';
 }
+
 async function editVisa(id, c, t, s, cost, price) {
-const country = prompt("Country:", c); if (!country) return;
-const visaType = prompt("Visa Type:", t);
-const trackingStatus = prompt("Status:", s);
-const supplierCost = prompt("Net Cost (BDT):", cost);
-const sellingPrice = prompt("Selling Price (BDT):", price);
+    const country = prompt("Country:", c); if (!country) return;
+    const visaType = prompt("Visa Type:", t);
+    const trackingStatus = prompt("Status:", s);
+    const supplierCost = prompt("Net Cost (BDT):", cost);
+    const sellingPrice = prompt("Selling Price (BDT):", price);
 const res = await fetch(${API_BASE_URL}/api/visa/update/${id}, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ country, visaType, trackingStatus, supplierCost, sellingPrice }) });
-if ((await res.json()).success) { alert("✅ Visa updated!"); refreshAll(); }
+if ((await res.json()).success) {
+alert("✅ Visa updated!");
+refreshAll();
+}
 }
 async function submitTicket(e) {
 e.preventDefault();
@@ -168,7 +194,11 @@ sellingPrice: document.getElementById('ticketPrice').value,
 amountPaid: document.getElementById('ticketPaid').value
 };
 const res = await fetch(${API_BASE_URL}/api/ticket/submit, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-if ((await res.json()).success) { alert("✈️ Ticket PNR saved!"); document.getElementById('ticketPaid').value = ''; refreshAll(); }
+if ((await res.json()).success) {
+alert("✈️ Ticket PNR saved!");
+document.getElementById('ticketPaid').value = '';
+refreshAll();
+}
 }
 async function loadTickets() {
 const res = await fetch(${API_BASE_URL}/api/tickets);
@@ -195,7 +225,10 @@ const route = prompt("Route:", rt);
 const supplierCost = prompt("Net Cost (BDT):", cost);
 const sellingPrice = prompt("Selling Price (BDT):", price);
 const res = await fetch(${API_BASE_URL}/api/ticket/update/${id}, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ gdsPnr, airlineCode, route, supplierCost, sellingPrice }) });
-if ((await res.json()).success) { alert("✅ Ticket updated!"); refreshAll(); }
+if ((await res.json()).success) {
+alert("✅ Ticket updated!");
+refreshAll();
+}
 }
 async function submitHotel(e) {
 e.preventDefault();
@@ -212,7 +245,11 @@ sellingPrice: document.getElementById('hotelPrice').value,
 amountPaid: document.getElementById('hotelPaid').value
 };
 const res = await fetch(${API_BASE_URL}/api/hotel/submit, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-if ((await res.json()).success) { alert("🏨 Hotel booking saved!"); e.target.reset(); refreshAll(); }
+if ((await res.json()).success) {
+alert("🏨 Hotel booking saved!");
+e.target.reset();
+refreshAll();
+}
 }
 async function loadHotels() {
 const res = await fetch(${API_BASE_URL}/api/hotels);
@@ -241,7 +278,10 @@ const roomType = prompt("Room Type:", r);
 const supplierCost = prompt("Net Cost (BDT):", cost);
 const sellingPrice = prompt("Selling Price (BDT):", price);
 const res = await fetch(${API_BASE_URL}/api/hotel/update/${id}, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ city, hotelName, roomType, supplierCost, sellingPrice }) });
-if ((await res.json()).success) { alert("✅ Hotel updated!"); refreshAll(); }
+if ((await res.json()).success) {
+alert("✅ Hotel updated!");
+refreshAll();
+}
 }
 async function submitPackage(e) {
 e.preventDefault();
@@ -259,7 +299,11 @@ sellingPrice: document.getElementById('pkgPrice').value,
 amountPaid: document.getElementById('pkgPaid').value
 };
 const res = await fetch(${API_BASE_URL}/api/package/submit, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-if ((await res.json()).success) { alert("📦 Package saved!"); e.target.reset(); refreshAll(); }
+if ((await res.json()).success) {
+alert("📦 Package saved!");
+e.target.reset();
+refreshAll();
+}
 }
 async function loadPackages() {
 const res = await fetch(${API_BASE_URL}/api/packages);
@@ -288,7 +332,10 @@ const includedServices = prompt("Services:", srv);
 const supplierCost = prompt("Net Cost (BDT):", cost);
 const sellingPrice = prompt("Selling Price (BDT):", price);
 const res = await fetch(${API_BASE_URL}/api/package/update/${id}, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ packageName, destination, travelersCount, includedServices, supplierCost, sellingPrice }) });
-if ((await res.json()).success) { alert("✅ Package updated!"); refreshAll(); }
+if ((await res.json()).success) {
+alert("✅ Package updated!");
+refreshAll();
+}
 }
 async function submitCustomer(e) {
 e.preventDefault();
@@ -301,7 +348,11 @@ expiryDate: document.getElementById('custExpiry').value
 };
 const res = await fetch(${API_BASE_URL}/api/customer/register, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
 const r = await res.json();
-if (r.success) { alert(✅ Client registered as ID #${r.customer.customer_id}); e.target.reset(); loadCustomers(); }
+if (r.success) {
+alert(✅ Client registered as ID #${r.customer.customer_id});
+e.target.reset();
+loadCustomers();
+}
 }
 async function loadCustomers() {
 const res = await fetch(${API_BASE_URL}/api/customers);
@@ -327,7 +378,10 @@ const phone = prompt("Mobile:", p);
 const passportNumber = prompt("Passport No:", pass);
 const expiryDate = prompt("Expiry (YYYY-MM-DD):", exp);
 const res = await fetch(${API_BASE_URL}/api/customer/update/${id}, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, phone, passportNumber, expiryDate }) });
-if ((await res.json()).success) { alert("✅ Client updated!"); loadCustomers(); }
+if ((await res.json()).success) {
+alert("✅ Client updated!");
+loadCustomers();
+}
 }
 async function submitExpense(e) {
 e.preventDefault();
@@ -339,7 +393,11 @@ expenseDate: document.getElementById('expDate').value,
 loggedBy: currentAgentId
 };
 const res = await fetch(${API_BASE_URL}/api/expense/submit, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-if ((await res.json()).success) { alert("🧾 Expense logged!"); e.target.reset(); refreshAll(); }
+if ((await res.json()).success) {
+alert("🧾 Expense logged!");
+e.target.reset();
+refreshAll();
+}
 }
 async function loadExpenses() {
 const res = await fetch(${API_BASE_URL}/api/expenses);
@@ -361,13 +419,19 @@ const category = prompt("Category:", c); if (!category) return;
 const description = prompt("Description:", d);
 const amount = prompt("Amount (BDT):", a);
 const res = await fetch(${API_BASE_URL}/api/expense/update/${id}, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ category, description, amount }) });
-if ((await res.json()).success) { alert("✅ Expense updated!"); refreshAll(); }
+if ((await res.json()).success) {
+alert("✅ Expense updated!");
+refreshAll();
+}
 }
 async function collectPayment(type, id, currPaid, total) {
 const add = prompt(Total: BDT ${total}\nPaid: BDT ${currPaid}\nDue: BDT ${total - currPaid}\n\nEnter new payment received (BDT):);
 if (!add || isNaN(add)) return;
 const res = await fetch(${API_BASE_URL}/api/payment/collect, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type, id, newPaidAmount: parseFloat(currPaid) + parseFloat(add) }) });
-if ((await res.json()).success) { alert("✅ Payment collected!"); refreshAll(); }
+if ((await res.json()).success) {
+alert("✅ Payment collected!");
+refreshAll();
+}
 }
 function openInvoice(invId, client, title, sub, totalVal, paidVal) {
 const total = parseFloat(totalVal);
@@ -385,7 +449,9 @@ document.getElementById('invPaid').innerText = 'BDT ' + paid.toLocaleString('en-
 document.getElementById('invDue').innerText = 'BDT ' + due.toLocaleString('en-IN', { minimumFractionDigits: 2 });
 document.getElementById('invoiceModal').classList.remove('hidden');
 }
-function closeInvoice() { document.getElementById('invoiceModal').classList.add('hidden'); }
+function closeInvoice() {
+document.getElementById('invoiceModal').classList.add('hidden');
+}
 function printInvoice() {
 const html = document.getElementById('printableReceipt').innerHTML;
 const w = window.open('', '', 'width=720,height=820');
@@ -402,5 +468,6 @@ loadExpenses();
 }
 currentAgentId = 1;
 loadEmployees();
+loadAgentData(1);
 loadCustomers();
 refreshAll();
