@@ -9,11 +9,11 @@ function switchTab(tabId) {
     if (target) target.classList.remove('hidden');
 
     document.querySelectorAll('.nav-tab-btn').forEach(btn => {
-        btn.className = "nav-tab-btn px-3.5 py-2 rounded-full text-xs font-medium text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 transition-all cursor-pointer";
+        btn.className = "nav-tab-btn px-3.5 py-2 rounded-full text-xs font-medium text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 transition-all cursor-pointer whitespace-nowrap";
     });
     const activeBtn = document.getElementById('btn-' + tabId);
     if (activeBtn) {
-        activeBtn.className = "nav-tab-btn px-4 py-2 rounded-full text-xs font-semibold bg-zinc-900 text-white shadow-sm transition-all cursor-pointer";
+        activeBtn.className = "nav-tab-btn px-4 py-2 rounded-full text-xs font-semibold bg-zinc-900 text-white shadow-sm transition-all cursor-pointer whitespace-nowrap";
     }
 }
 
@@ -43,9 +43,7 @@ async function loadDashboardStats() {
         document.getElementById('statPkgAmt').innerText = fmt(d.packages.amount);
 
         renderCharts(d);
-    } catch (err) {
-        console.error("Dashboard stats error:", err);
-    }
+    } catch (err) { console.error("Dashboard stats error:", err); }
 }
 
 function renderCharts(d) {
@@ -59,18 +57,8 @@ function renderCharts(d) {
             data: {
                 labels: ['Visas', 'Air Tickets', 'Hotels', 'Tour Packages'],
                 datasets: [
-                    {
-                        label: 'Total Sales (BDT)',
-                        data: [d.visas.amount, d.tickets.amount, d.hotels.amount, d.packages.amount],
-                        backgroundColor: ['#10b981', '#3b82f6', '#6366f1', '#14b8a6'],
-                        borderRadius: 8
-                    },
-                    {
-                        label: 'Net Profit Margin (BDT)',
-                        data: [d.visas.profit, d.tickets.profit, d.hotels.profit, d.packages.profit],
-                        backgroundColor: ['#047857', '#1d4ed8', '#4338ca', '#0f766e'],
-                        borderRadius: 8
-                    }
+                    { label: 'Total Sales (BDT)', data: [d.visas.amount, d.tickets.amount, d.hotels.amount, d.packages.amount], backgroundColor: ['#10b981', '#3b82f6', '#6366f1', '#14b8a6'], borderRadius: 8 },
+                    { label: 'Net Profit Margin (BDT)', data: [d.visas.profit, d.tickets.profit, d.hotels.profit, d.packages.profit], backgroundColor: ['#047857', '#1d4ed8', '#4338ca', '#0f766e'], borderRadius: 8 }
                 ]
             },
             options: { responsive: true, maintainAspectRatio: false }
@@ -84,11 +72,7 @@ function renderCharts(d) {
             type: 'doughnut',
             data: {
                 labels: ['Visa Processing', 'Air Ticketing', 'Hotel Bookings', 'Tour & Umrah Packages'],
-                datasets: [{
-                    data: [d.visas.count || 0, d.tickets.count || 0, d.hotels.count || 0, d.packages.count || 0],
-                    backgroundColor: ['#10b981', '#3b82f6', '#6366f1', '#f59e0b'],
-                    borderWidth: 2
-                }]
+                datasets: [{ data: [d.visas.count || 0, d.tickets.count || 0, d.hotels.count || 0, d.packages.count || 0], backgroundColor: ['#10b981', '#3b82f6', '#6366f1', '#f59e0b'], borderWidth: 2 }]
             },
             options: { responsive: true, maintainAspectRatio: false }
         });
@@ -108,9 +92,7 @@ async function loadAgentData(id) {
             document.getElementById('cardCommEarned').innerText = 'BDT ' + data.commissionEarned.toLocaleString('en-IN', { minimumFractionDigits: 2 });
             document.getElementById('netPayout').innerText = 'BDT ' + data.netPayout.toLocaleString('en-IN', { minimumFractionDigits: 2 });
         }
-    } catch (err) {
-        console.error("Payroll fetch error:", err);
-    }
+    } catch (err) { console.error("Payroll fetch error:", err); }
 }
 
 async function loadEmployees() {
@@ -121,7 +103,7 @@ async function loadEmployees() {
         if (switcher && employees.length > 0) {
             switcher.innerHTML = employees.map(emp => {
                 const isActive = emp.employee_id === currentAgentId;
-                const cls = isActive ? "px-3.5 py-2 bg-emerald-700 text-white rounded-lg text-xs font-bold shadow" : "px-3.5 py-2 bg-slate-100 text-slate-700 rounded-lg text-xs font-semibold hover:bg-slate-200";
+                const cls = isActive ? "px-3.5 py-2 bg-zinc-900 text-white rounded-lg text-xs font-bold shadow cursor-pointer" : "px-3.5 py-2 bg-zinc-100 text-zinc-700 rounded-lg text-xs font-semibold hover:bg-zinc-200 cursor-pointer";
                 return `<button onclick="switchAgent(${emp.employee_id})" class="${cls}">${emp.name} (ID: ${emp.employee_id})</button>`;
             }).join('');
         }
@@ -129,13 +111,13 @@ async function loadEmployees() {
         const tbody = document.getElementById('staffTableBody');
         if (tbody) {
             tbody.innerHTML = employees.map(emp => `
-                <tr class="hover:bg-slate-50">
-                    <td class="p-3 font-bold text-slate-800">#${emp.employee_id} ${emp.name}</td>
-                    <td class="p-3"><div class="font-semibold text-slate-700">${emp.role}</div><div class="text-[10px] text-slate-400">${emp.email}</div></td>
-                    <td class="p-3 font-mono font-bold text-slate-700">BDT ${parseFloat(emp.base_salary).toLocaleString()}</td>
+                <tr class="hover:bg-zinc-50">
+                    <td class="p-3 font-bold text-zinc-800">#${emp.employee_id} ${emp.name}</td>
+                    <td class="p-3"><div class="font-semibold text-zinc-700">${emp.role}</div><div class="text-[10px] text-zinc-400">${emp.email}</div></td>
+                    <td class="p-3 font-mono font-bold text-zinc-700">BDT ${parseFloat(emp.base_salary).toLocaleString()}</td>
                     <td class="p-3 font-bold text-emerald-700">${parseFloat(emp.commission_rate)}%</td>
                     <td class="p-3 text-right">
-                        <button onclick="editEmployee(${emp.employee_id}, '${emp.name}', '${emp.role}', ${emp.base_salary}, ${emp.commission_rate})" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[11px] font-bold">✏️ Edit</button>
+                        <button onclick="editEmployee(${emp.employee_id}, '${emp.name}', '${emp.role}', ${emp.base_salary}, ${emp.commission_rate})" class="px-2.5 py-1 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 rounded-lg text-[11px] font-bold">✏️ Edit</button>
                     </td>
                 </tr>
             `).join('');
@@ -150,14 +132,12 @@ async function submitEmployee(e) {
     const payload = {
         name: document.getElementById('empName').value,
         email: document.getElementById('empEmail').value,
-        password: document.getElementById('empPass').value,
         role: document.getElementById('empRole').value,
         baseSalary: document.getElementById('empSalary').value,
         commissionRate: document.getElementById('empComm').value
     };
     const res = await fetch(`${API_BASE_URL}/api/employee/add`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-    const r = await res.json();
-    if (r.success) { alert("✅ New staff hired!"); e.target.reset(); loadEmployees(); }
+    if ((await res.json()).success) { alert("✅ New staff hired!"); e.target.reset(); loadEmployees(); }
 }
 
 async function editEmployee(id, oldName, oldRole, oldSal, oldComm) {
@@ -165,8 +145,7 @@ async function editEmployee(id, oldName, oldRole, oldSal, oldComm) {
     const role = prompt("Job Title:", oldRole); if (!role) return;
     const baseSalary = prompt("Base Salary (BDT):", oldSal);
     const commissionRate = prompt("Commission %:", oldComm);
-    const newPassword = prompt("New Password (leave blank to keep current):", "");
-    const res = await fetch(`${API_BASE_URL}/api/employee/update/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, role, baseSalary, commissionRate, newPassword }) });
+    const res = await fetch(`${API_BASE_URL}/api/employee/update/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, role, baseSalary, commissionRate }) });
     if ((await res.json()).success) { alert("✅ Staff updated!"); loadEmployees(); loadAgentData(currentAgentId); }
 }
 
@@ -193,9 +172,9 @@ async function loadVisas() {
     tbody.innerHTML = list.length ? list.map(v => {
         const paid = v.amount_paid !== null ? parseFloat(v.amount_paid) : parseFloat(v.selling_price);
         const due = parseFloat(v.selling_price) - paid;
-        const badge = due > 0 ? <span class="block text-[10px] font-bold text-red-600">Due: BDT ${due.toLocaleString()}</span> : <span class="block text-[10px] font-bold text-emerald-600">✓ Full Paid</span>;
-const payBtn = due > 0 ? <button onclick="collectPayment('visa', ${v.visa_booking_id}, ${paid}, ${v.selling_price})" class="px-2 py-1 bg-amber-100 text-amber-800 rounded text-[11px] font-bold">💵 Pay</button> : '';
-return `
+        const badge = due > 0 ? `<span class="block text-[10px] font-bold text-rose-600">Due: BDT ${due.toLocaleString()}</span>` : `<span class="block text-[10px] font-bold text-emerald-600">✓ Full Paid</span>`;
+        const payBtn = due > 0 ? `<button onclick="collectPayment('visa', ${v.visa_booking_id}, ${paid}, ${v.selling_price})" class="px-2 py-1 bg-amber-100 text-amber-800 rounded text-[11px] font-bold">💵 Pay</button>` : '';
+        return `<tr class="hover:bg-zinc-50">
 ${v.country}${v.visa_type}
 ${v.customer_name || 'ID #' + v.customer_id}
 • BDT \(parseFloat(v.margin_{e}arned).toLocaleString()\){badge}
@@ -235,7 +214,7 @@ if (!tbody) return;
 tbody.innerHTML = list.length ? list.map(t => {
 const paid = t.amount_paid !== null ? parseFloat(t.amount_paid) : parseFloat(t.selling_price);
 const due = parseFloat(t.selling_price) - paid;
-const badge = due > 0 ? <span class="block text-[10px] font-bold text-red-600">Due: BDT ${due.toLocaleString()}</span> : <span class="block text-[10px] font-bold text-emerald-600">✓ Full Paid</span>;
+const badge = due > 0 ? <span class="block text-[10px] font-bold text-rose-600">Due: BDT ${due.toLocaleString()}</span> : <span class="block text-[10px] font-bold text-emerald-600">✓ Full Paid</span>;
 const payBtn = due > 0 ? <button onclick="collectPayment('ticket', ${t.ticket_id}, ${paid}, ${t.selling_price})" class="px-2 py-1 bg-amber-100 text-amber-800 rounded text-[11px] font-bold">💵 Pay</button> : '';
 return `
 ${t.gds_pnr} (${t.airline_code})${t.route}
@@ -281,7 +260,7 @@ const inD = new Date(h.check_in).toLocaleDateString('en-GB');
 const outD = new Date(h.check_out).toLocaleDateString('en-GB');
 const paid = h.amount_paid !== null ? parseFloat(h.amount_paid) : parseFloat(h.selling_price);
 const due = parseFloat(h.selling_price) - paid;
-const badge = due > 0 ? <span class="block text-[10px] font-bold text-red-600">Due: BDT ${due.toLocaleString()}</span> : <span class="block text-[10px] font-bold text-emerald-600">✓ Full Paid</span>;
+const badge = due > 0 ? <span class="block text-[10px] font-bold text-rose-600">Due: BDT ${due.toLocaleString()}</span> : <span class="block text-[10px] font-bold text-emerald-600">✓ Full Paid</span>;
 const payBtn = due > 0 ? <button onclick="collectPayment('hotel', ${h.hotel_booking_id}, ${paid}, ${h.selling_price})" class="px-2 py-1 bg-amber-100 text-amber-800 rounded text-[11px] font-bold">💵 Pay</button> : '';
 return `
 ${h.hotel_name}${h.city} • ${inD} to ${outD}
@@ -327,7 +306,7 @@ tbody.innerHTML = list.length ? list.map(p => {
 const depD = new Date(p.departure_date).toLocaleDateString('en-GB');
 const paid = p.amount_paid !== null ? parseFloat(p.amount_paid) : parseFloat(p.selling_price);
 const due = parseFloat(p.selling_price) - paid;
-const badge = due > 0 ? <span class="block text-[10px] font-bold text-red-600">Due: BDT ${due.toLocaleString()}</span> : <span class="block text-[10px] font-bold text-emerald-600">✓ Full Paid</span>;
+const badge = due > 0 ? <span class="block text-[10px] font-bold text-rose-600">Due: BDT ${due.toLocaleString()}</span> : <span class="block text-[10px] font-bold text-emerald-600">✓ Full Paid</span>;
 const payBtn = due > 0 ? <button onclick="collectPayment('package', ${p.package_id}, ${paid}, ${p.selling_price})" class="px-2 py-1 bg-amber-100 text-amber-800 rounded text-[11px] font-bold">💵 Pay</button> : '';
 return `
 ${p.package_name} (${p.travelers_count} Pax)${p.category} • ${depD}
@@ -446,7 +425,7 @@ function closeInvoice() { document.getElementById('invoiceModal').classList.add(
 function printInvoice() {
 const html = document.getElementById('printableReceipt').innerHTML;
 const w = window.open('', '', 'width=720,height=820');
-w.document.write(<html><head><title>CM Travels & Tours Receipt</title><script src="https://tailwindcss.com"><\/script></head><body class="p-8 bg-white"><div class="max-w-lg mx-auto border border-slate-300 rounded-2xl p-6 space-y-5">${html}</div><script>setTimeout(()=>{window.print();window.close();},500);<\/script></body></html>);
+w.document.write(<html><head><title>CM Travels & Tours Receipt</title><script src="https://tailwindcss.com"><\/script></head><body class="p-8 bg-white"><div class="max-w-lg mx-auto border border-zinc-300 rounded-2xl p-6 space-y-5">${html}</div><script>setTimeout(()=>{window.print();window.close();},500);<\/script></body></html>);
 w.document.close();
 }
 function refreshAll() {
@@ -458,38 +437,7 @@ loadHotels();
 loadPackages();
 loadExpenses();
 }
-function startOpenDashboard(agentId) {
-    currentAgentId = agentId;
-    loadEmployees();
-    loadCustomers();
-    refreshAll();
-}
-
-startOpenDashboard(1);
-
-async function handleLogin(e) {
-e.preventDefault();
-const errBox = document.getElementById('loginError');
-errBox.classList.add('hidden');
-const res = await fetch(${API_BASE_URL}/api/login, {
-method: 'POST',
-headers: { 'Content-Type': 'application/json' },
-body: JSON.stringify({ email: document.getElementById('loginEmail').value, password: document.getElementById('loginPassword').value })
-});
-const data = await res.json();
-if (data.success && data.user) {
-localStorage.setItem('webboStaffSession', JSON.stringify(data.user));
-initProtectedDashboard(data.user.employee_id);
-} else {
-errBox.innerText = data.error || "Invalid credentials";
-errBox.classList.remove('hidden');
-}
-}
-function logoutUser() {
-localStorage.removeItem('webboStaffSession');
-document.getElementById('loginOverlay').classList.remove('hidden');
-}
-const savedSession = localStorage.getItem('webboStaffSession');
-if (savedSession) {
-initProtectedDashboard(JSON.parse(savedSession).employee_id || 1);
-}
+currentAgentId = 1;
+loadEmployees();
+loadCustomers();
+refreshAll();
