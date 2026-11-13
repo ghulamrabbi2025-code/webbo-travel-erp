@@ -3,337 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CM Travels & Tours ERP</title>
+    <title>CM Travels & Tours ERP System</title>
     <script src="https://tailwindcss.com"></script>
     <script src="https://jsdelivr.net"></script>
 </head>
-<body class="bg-gradient-to-br from-slate-100 via-emerald-50/40 to-blue-50/40 text-slate-800 min-h-screen">
+<body class="bg-[#F4F5F7] text-zinc-800 min-h-screen pb-28 antialiased">
 
-    <!-- Rich Gradient Company Banner -->
-    <header class="bg-gradient-to-r from-slate-900 via-emerald-900 to-teal-900 text-white px-6 py-5 shadow-xl">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+    <!-- Login Lock Screen -->
+    <div id="loginOverlay" class="fixed inset-0 bg-zinc-900/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-xl border border-zinc-200 space-y-6">
+            <div class="text-center space-y-1">
+                <div class="text-3xl">🕋</div>
+                <h2 class="text-xl font-bold text-zinc-900">CM Travels & Tours</h2>
+                <p class="text-xs text-zinc-500">Jam-Jam Shopping Center (2nd Floor), West Kafrul, Dhaka</p>
+            </div>
+            <form id="loginForm" class="space-y-4 text-xs" onsubmit="handleLogin(event)">
+                <input type="email" id="loginEmail" required placeholder="Staff Email (e.g. mahbub@agency.com)" class="w-full p-3.5 bg-zinc-50 border border-zinc-200 rounded-xl">
+                <input type="password" id="loginPassword" required placeholder="Security Password" class="w-full p-3.5 bg-zinc-50 border border-zinc-200 rounded-xl">
+                <p id="loginError" class="hidden text-red-600 bg-red-50 p-2.5 rounded-xl text-center font-medium"></p>
+                <button type="submit" class="w-full bg-zinc-900 hover:bg-zinc-800 text-white font-semibold p-3.5 rounded-xl shadow">Sign In to Workspace</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Minimalist Soft-Gray Top Bar -->
+    <header class="bg-white/80 backdrop-blur-md border-b border-zinc-200/80 sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
             <div>
-                <h1 class="text-2xl font-black tracking-tight text-amber-300">🕋 CM Travels & Tours ERP</h1>
-                <p class="text-xs text-emerald-100/80">Jam-Jam Shopping Center (2nd Floor), 97, West Kafrul, Taltala, Sher-E-Bangla Nagar, Dhaka</p>
+                <div class="flex items-center gap-2.5">
+                    <span class="text-lg">🕋</span>
+                    <h1 class="text-base md:text-lg font-bold text-zinc-900 tracking-tight">CM Travels & Tours ERP System</h1>
+                    <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-semibold px-2.5 py-0.5 rounded-full">Cloud Live</span>
+                </div>
+                <p class="text-[11px] text-zinc-500 mt-0.5">Jam-Jam Shopping Center (2nd Floor), 97, West Kafrul, Taltala, Sher-E-Bangla Nagar, Dhaka, Bangladesh</p>
             </div>
-            <div class="flex items-center gap-3">
-                <span class="bg-emerald-500/20 border border-emerald-400/30 text-emerald-200 px-3 py-1 rounded-full text-xs font-semibold">🟢 Cloud Live</span>
-                <button onclick="logoutUser()" class="text-xs text-red-300 hover:text-white underline font-semibold">Logout</button>
-            </div>
+            <a href="javascript:void(0)" onclick="logoutUser()" class="text-xs font-medium text-zinc-500 hover:text-red-600 transition-colors">Sign Out →</a>
         </div>
-
-        <!-- Sleek Underline Navigation Links (No Boxy Buttons) -->
-        <nav class="max-w-7xl mx-auto flex gap-6 mt-5 border-t border-white/10 pt-3 text-xs font-bold overflow-x-auto">
-            <a href="javascript:void(0)" onclick="switchTab('tab-overview')" id="btn-tab-overview" class="nav-tab-btn text-amber-300 border-b-2 border-amber-300 pb-2">📊 Executive Overview</a>
-            <a href="javascript:void(0)" onclick="switchTab('tab-bookings')" id="btn-tab-bookings" class="nav-tab-btn text-emerald-100/70 hover:text-white pb-2">🛂 Visas & Air Tickets</a>
-            <a href="javascript:void(0)" onclick="switchTab('tab-hotels')" id="btn-tab-hotels" class="nav-tab-btn text-emerald-100/70 hover:text-white pb-2">🏨 Hotels & Packages</a>
-            <a href="javascript:void(0)" onclick="switchTab('tab-clients')" id="btn-tab-clients" class="nav-tab-btn text-emerald-100/70 hover:text-white pb-2">🗂️ Clients & Passports</a>
-            <a href="javascript:void(0)" onclick="switchTab('tab-admin')" id="btn-tab-admin" class="nav-tab-btn text-emerald-100/70 hover:text-white pb-2">💸 Expenses & Staff HR</a>
-        </nav>
     </header>
 
+    <!-- Main Centered Container -->
+    <main class="max-w-7xl mx-auto px-4 md:px-6 pt-6 space-y-6">
 
-
-The raw HTML structures needed to restore the visual design, login lock screen, header, left sidebar, and executive dashboard elements (including KPI cards, department statistics, Chart.js visualizers, and the staff payroll matrix) are provided in full within the code blocks of the referenced GitHub repository and deployment setup instructions.
-To apply them:
-• Block 1: Inserts the document setup, Tailwind CSS styling, Chart.js integration, login overlay, corporate header for CM Travels & Tours in Dhaka, and the emerald dark mode left navigation sidebar.
-• Block 2: Adds the financial KPI summary cards, department metrics for visas, air tickets, hotels, and Umrah packages, the interactive charts, and the consultant payroll ledger.
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>CM Travels & Tours Dashboard</title>
-    <!-- This line adds all the colors, shadows, and modern styling -->
-    <script src="https://tailwindcss.com"></script>
-    <script src="https://jsdelivr.net"></script>
-</head>
-<body class="bg-slate-100 text-slate-800">
-
-    <!-- Stylish Top Header -->
-    <header class="bg-emerald-900 text-white p-4 shadow-lg flex justify-between items-center">
-        <div>
-            <h1 class="text-xl font-bold">🕋 CM Travels & Tours ERP</h1>
-            <p class="text-xs text-emerald-200">Jam-Jam Shopping Center (2nd Floor), West Kafrul, Dhaka</p>
-        </div>
-        <span class="bg-emerald-700 px-3 py-1 rounded-full text-xs font-bold">🟢 Cloud Live</span>
-    </header>
-
-    <!-- Main Layout: Left Sidebar + Right Content -->
-    <div class="flex min-h-screen">
-        
-        <!-- Dark Left Sidebar -->
-        <aside class="w-60 bg-emerald-950 text-white p-4 space-y-2">
-            <button onclick="switchTab('tab-overview')" id="btn-tab-overview" class="nav-tab-btn w-full text-left px-4 py-3 rounded-xl text-xs font-bold bg-white text-emerald-950">📊 Dashboard Overview</button>
-            <button onclick="switchTab('tab-bookings')" id="btn-tab-bookings" class="nav-tab-btn w-full text-left px-4 py-3 rounded-xl text-xs font-semibold text-emerald-100 hover:bg-white/10">🛂 Visas & Air Tickets</button>
-            <button onclick="switchTab('tab-hotels')" id="btn-tab-hotels" class="nav-tab-btn w-full text-left px-4 py-3 rounded-xl text-xs font-semibold text-emerald-100 hover:bg-white/10">🏨 Hotels & Packages</button>
-            <button onclick="switchTab('tab-clients')" id="btn-tab-clients" class="nav-tab-btn w-full text-left px-4 py-3 rounded-xl text-xs font-semibold text-emerald-100 hover:bg-white/10">🗂️ Clients & Passports</button>
-            <button onclick="switchTab('tab-admin')" id="btn-tab-admin" class="nav-tab-btn w-full text-left px-4 py-3 rounded-xl text-xs font-semibold text-emerald-100 hover:bg-white/10">💸 Expenses & HR</button>
-        </aside>
-
-        <!-- Right Workspace -->
-        <main class="flex-1 p-6 space-y-6">
+        <!-- TAB 1: EXECUTIVE DASHBOARD -->
+        <div id="tab-overview" class="erp-tab-section space-y-6">
             
-            <!-- Colorful KPI Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div class="bg-white p-5 rounded-2xl shadow border-l-4 border-emerald-500">
-                    <p class="text-xs font-bold text-slate-400 uppercase">Total Sales</p>
-                    <h2 id="kpiTotalSales" class="text-xl font-black text-slate-800 mt-1">BDT 0.00</h2>
+            <!-- 4 Financial KPI Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-sm">
+                    <span class="text-[11px] font-medium text-zinc-400">Total Agency Sales</span>
+                    <h3 id="kpiTotalSales" class="text-xl font-bold text-zinc-900 mt-1">BDT 0.00</h3>
                 </div>
-                <div class="bg-white p-5 rounded-2xl shadow border-l-4 border-blue-500">
-                    <p class="text-xs font-bold text-slate-400 uppercase">Operating Profit</p>
-                    <h2 id="kpiOpProfit" class="text-xl font-black text-blue-700 mt-1">BDT 0.00</h2>
+                <div class="bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-sm">
+                    <span class="text-[11px] font-medium text-zinc-400">Operating Profit</span>
+                    <h3 id="kpiOpProfit" class="text-xl font-bold text-emerald-600 mt-1">BDT 0.00</h3>
                 </div>
-                <div class="bg-white p-5 rounded-2xl shadow border-l-4 border-amber-500">
-                    <p class="text-xs font-bold text-slate-400 uppercase">Customer Due</p>
-                    <h2 id="kpiCustDue" class="text-xl font-black text-amber-600 mt-1">BDT 0.00</h2>
+                <div class="bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-sm">
+                    <span class="text-[11px] font-medium text-zinc-400">Customer Due Receivable</span>
+                    <h3 id="kpiCustDue" class="text-xl font-bold text-amber-600 mt-1">BDT 0.00</h3>
                 </div>
-                <div class="bg-white p-5 rounded-2xl shadow border-l-4 border-red-500">
-                    <p class="text-xs font-bold text-slate-400 uppercase">Last Month Expenses</p>
-                    <h2 id="kpiLastMonthExp" class="text-xl font-black text-red-600 mt-1">BDT 0.00</h2>
-                </div>
-            </div>
-
-        </main>
-    </div>
-
-</body>
-</html>
-
-<!-- TAB 2: VISAS & AIR TICKETS -->
-            <div id="tab-bookings" class="erp-tab-section hidden space-y-6">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Visa Form -->
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-3">
-                        <h3 class="font-bold text-slate-800 text-sm border-b pb-2">🛂 Log Tourist & Umrah Visas</h3>
-                        <form id="visaForm" class="space-y-2.5 text-xs font-semibold" onsubmit="submitVisa(event)">
-                            <div class="grid grid-cols-2 gap-2">
-                                <input type="number" id="visaCustId" required value="1" placeholder="Customer ID" class="w-full p-2.5 bg-slate-50 border rounded-xl">
-                                <input type="text" id="visaCountry" required value="Saudi Arabia" placeholder="Country" class="w-full p-2.5 bg-slate-50 border rounded-xl">
-                            </div>
-                            <input type="text" id="visaType" required value="Umrah Visa" placeholder="Visa Subcategory" class="w-full p-2.5 bg-slate-50 border rounded-xl">
-                            <div class="grid grid-cols-3 gap-2">
-                                <input type="number" id="visaCost" required placeholder="Net Cost" class="w-full p-2.5 bg-slate-50 border rounded-xl text-red-600 font-bold">
-                                <input type="number" id="visaPrice" required placeholder="Selling Price" class="w-full p-2.5 bg-slate-50 border rounded-xl text-emerald-600 font-bold">
-                                <input type="number" id="visaPaid" placeholder="Paid Now" class="w-full p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl font-bold">
-                            </div>
-                            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold p-3 rounded-xl">💾 Save Visa Entry</button>
-                        </form>
-                    </div>
-
-                    <!-- Flight Ticket Form -->
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-3">
-                        <h3 class="font-bold text-slate-800 text-sm border-b pb-2">✈️ Log Flight Ticket PNR</h3>
-                        <form id="ticketForm" class="space-y-2.5 text-xs font-semibold" onsubmit="submitTicket(event)">
-                            <div class="grid grid-cols-3 gap-2">
-                                <input type="number" id="ticketCustId" required value="1" placeholder="Client ID" class="w-full p-2.5 bg-slate-50 border rounded-xl">
-                                <input type="text" id="gdsPnr" required placeholder="GDS PNR" class="w-full p-2.5 bg-slate-50 border rounded-xl uppercase">
-                                <input type="text" id="airlineCode" required placeholder="Airline (BG/EK)" class="w-full p-2.5 bg-slate-50 border rounded-xl uppercase">
-                            </div>
-                            <input type="text" id="route" required placeholder="Route (e.g. DAC-DXB-JED)" class="w-full p-2.5 bg-slate-50 border rounded-xl uppercase">
-                            <div class="grid grid-cols-3 gap-2">
-                                <input type="number" id="ticketCost" required placeholder="Net Cost" class="w-full p-2.5 bg-slate-50 border rounded-xl text-red-600 font-bold">
-                                <input type="number" id="ticketPrice" required placeholder="Selling Price" class="w-full p-2.5 bg-slate-50 border rounded-xl text-emerald-600 font-bold">
-                                <input type="number" id="ticketPaid" placeholder="Paid Now" class="w-full p-2.5 bg-blue-50 border border-blue-200 rounded-xl font-bold">
-                            </div>
-                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded-xl">💾 Log Ticket PNR</button>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Visa & Ticket Ledgers -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
-                        <div class="p-3.5 bg-slate-50 border-b font-bold text-xs text-slate-800">🛂 Visa Processing Ledger</div>
-                        <div class="overflow-x-auto"><table class="w-full text-left text-xs"><tbody id="visaTableBody" class="divide-y"></tbody></table></div>
-                    </div>
-                    <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
-                        <div class="p-3.5 bg-slate-50 border-b font-bold text-xs text-slate-800">✈️ Air Ticketing PNR Ledger</div>
-                        <div class="overflow-x-auto"><table class="w-full text-left text-xs"><tbody id="ticketTableBody" class="divide-y"></tbody></table></div>
-                    </div>
+                <div class="bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-sm">
+                    <span class="text-[11px] font-medium text-zinc-400">Last Month Expenses</span>
+                    <h3 id="kpiLastMonthExp" class="text-xl font-bold text-rose-600 mt-1">BDT 0.00</h3>
                 </div>
             </div>
 
-            <!-- TAB 3: HOTELS & PACKAGES -->
-            <div id="tab-hotels" class="erp-tab-section hidden space-y-6">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Global Hotel Form -->
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-3">
-                        <h3 class="font-bold text-slate-800 text-sm border-b pb-2">🏨 Worldwide Hotel Booking</h3>
-                        <form id="hotelForm" class="space-y-2.5 text-xs font-semibold" onsubmit="submitHotel(event)">
-                            <div class="grid grid-cols-2 gap-2">
-                                <input type="number" id="hotelCustId" required value="1" placeholder="Client ID" class="w-full p-2.5 bg-slate-50 border rounded-xl">
-                                <input type="text" id="hotelCity" required placeholder="City / Country" class="w-full p-2.5 bg-slate-50 border rounded-xl">
-                            </div>
-                            <div class="grid grid-cols-2 gap-2">
-                                <input type="text" id="hotelName" required placeholder="Hotel Name" class="w-full p-2.5 bg-slate-50 border rounded-xl">
-                                <input type="text" id="hotelRoom" required placeholder="Room Type" class="w-full p-2.5 bg-slate-50 border rounded-xl">
-                            </div>
-                            <div class="grid grid-cols-2 gap-2">
-                                <input type="date" id="hotelCheckIn" required class="w-full p-2.5 bg-slate-50 border rounded-xl">
-                                <input type="date" id="hotelCheckOut" required class="w-full p-2.5 bg-slate-50 border rounded-xl">
-                            </div>
-                            <div class="grid grid-cols-3 gap-2">
-                                <input type="number" id="hotelCost" required placeholder="Net Cost" class="w-full p-2.5 bg-slate-50 border rounded-xl text-red-600 font-bold">
-                                <input type="number" id="hotelPrice" required placeholder="Selling Price" class="w-full p-2.5 bg-slate-50 border rounded-xl text-emerald-600 font-bold">
-                                <input type="number" id="hotelPaid" placeholder="Paid Now" class="w-full p-2.5 bg-indigo-50 border border-indigo-200 rounded-xl font-bold">
-                            </div>
-                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold p-3 rounded-xl">💾 Save Hotel Booking</button>
-                        </form>
-                    </div>
-
-                    <!-- Tour / Umrah Package Form -->
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-3">
-                        <h3 class="font-bold text-slate-800 text-sm border-b pb-2">🧳 Tour & Hajj/Umrah Package Builder</h3>
-                        <form id="packageForm" class="space-y-2.5 text-xs font-semibold" onsubmit="submitPackage(event)">
-                            <div class="grid grid-cols-3 gap-2">
-                                <input type="number" id="pkgCustId" required value="1" placeholder="Client ID" class="w-full p-2.5 bg-slate-50 border rounded-xl">
-                                <select id="pkgCategory" class="w-full p-2.5 bg-slate-50 border rounded-xl">
-                                    <option value="Umrah Package">Umrah Package</option>
-                                    <option value="Hajj Package">Hajj Package</option>
-                                    <option value="International Tour">International Tour</option>
-                                    <option value="Domestic Tour">Domestic Tour</option>
-                                </select>
-                                <input type="number" id="pkgPax" required value="2" placeholder="Pax" class="w-full p-2.5 bg-slate-50 border rounded-xl">
-                            </div>
-                            <div class="grid grid-cols-2 gap-2">
-                                <input type="text" id="pkgName" required placeholder="Package Title" class="w-full p-2.5 bg-slate-50 border rounded-xl">
-                                <input type="text" id="pkgDest" required placeholder="Destination" class="w-full p-2.5 bg-slate-50 border rounded-xl">
-                            </div>
-                            <div class="grid grid-cols-2 gap-2">
-                                <input type="date" id="pkgDate" required class="w-full p-2.5 bg-slate-50 border rounded-xl">
-                                <input type="text" id="pkgServices" required placeholder="Services (Flight+Hotel+Visa)" class="w-full p-2.5 bg-slate-50 border rounded-xl">
-                            </div>
-                            <div class="grid grid-cols-3 gap-2">
-                                <input type="number" id="pkgCost" required placeholder="Net Cost" class="w-full p-2.5 bg-slate-50 border rounded-xl text-red-600 font-bold">
-📦 Save Package
-
-
-🌍 Global Hotel Bookings Ledger
-
-
-
-🗂️ Tour & Umrah Packages Ledger
-
-            <!-- TAB 4: CLIENTS & PASSPORTS & TAB 5: EXPENSES & STAFF HR -->
-            <!-- Contains forms and ledgers for traveler registration, office expenses, and staff management -->
-            <!-- TAB 6 / MODAL: PRINTABLE CLIENT INVOICE & FOOTER / SCRIPTS -->
-        </main>
-    </div>
-              <!-- TAB 4: CLIENTS & PASSPORTS -->
-            <div id="tab-clients" class="erp-tab-section hidden space-y-6">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-3">
-                        <h3 class="font-bold text-slate-800 text-sm border-b pb-2">🛂 Register Traveler & Passport</h3>
-                        <form id="customerForm" class="space-y-2.5 text-xs font-semibold" onsubmit="submitCustomer(event)">
-                            <input type="text" id="custName" required placeholder="Full Name (As per Passport)" class="w-full p-2.5 bg-slate-50 border rounded-xl">
-                            <input type="text" id="custPhone" required placeholder="Mobile (+8801...)" class="w-full p-2.5 bg-slate-50 border rounded-xl">
-                            <input type="text" id="custCompany" placeholder="Company / Group Name" class="w-full p-2.5 bg-slate-50 border rounded-xl">
-                            <div class="grid grid-cols-2 gap-2">
-                                <input type="text" id="custPassport" required placeholder="Passport No." class="w-full p-2.5 bg-slate-50 border rounded-xl uppercase font-mono">
-                                <input type="date" id="custExpiry" required class="w-full p-2.5 bg-slate-50 border rounded-xl">
-                            </div>
-                            <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold p-3 rounded-xl">➕ Register Client</button>
-                        </form>
-                    </div>
-                    <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border overflow-hidden">
-                        <div class="p-3.5 bg-slate-50 border-b font-bold text-xs text-slate-800">🗂️ Client & Passport Registry</div>
-                        <div class="overflow-x-auto"><table class="w-full text-left text-xs"><tbody id="customerTableBody" class="divide-y"></tbody></table></div>
-                    </div>
+            <!-- 4 Department Count & Amount Cards -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-4 rounded-2xl border border-zinc-200/80 shadow-sm">
+                    <div class="flex justify-between items-center text-xs text-zinc-400"><span>Visa Processing</span><span>🛂</span></div>
+                    <div id="statVisaCount" class="text-base font-bold text-zinc-900 mt-2">0 Visas</div>
+                    <div id="statVisaAmt" class="text-xs font-medium text-emerald-600 mt-0.5">BDT 0.00</div>
+                </div>
+                <div class="bg-white p-4 rounded-2xl border border-zinc-200/80 shadow-sm">
+                    <div class="flex justify-between items-center text-xs text-zinc-400"><span>Air Ticketing</span><span>✈️</span></div>
+                    <div id="statTicketCount" class="text-base font-bold text-zinc-900 mt-2">0 Tickets</div>
+                    <div id="statTicketAmt" class="text-xs font-medium text-blue-600 mt-0.5">BDT 0.00</div>
+                </div>
+                <div class="bg-white p-4 rounded-2xl border border-zinc-200/80 shadow-sm">
+                    <div class="flex justify-between items-center text-xs text-zinc-400"><span>Hotel Bookings</span><span>🏨</span></div>
+                    <div id="statHotelCount" class="text-base font-bold text-zinc-900 mt-2">0 Bookings</div>
+                    <div id="statHotelAmt" class="text-xs font-medium text-indigo-600 mt-0.5">BDT 0.00</div>
+                </div>
+                <div class="bg-white p-4 rounded-2xl border border-zinc-200/80 shadow-sm">
+                    <div class="flex justify-between items-center text-xs text-zinc-400"><span>Tour Packages</span><span>🧳</span></div>
+                    <div id="statPkgCount" class="text-base font-bold text-zinc-900 mt-2">0 Packages</div>
+                    <div id="statPkgAmt" class="text-xs font-medium text-teal-600 mt-0.5">BDT 0.00</div>
                 </div>
             </div>
 
-            <!-- TAB 5: EXPENSES & STAFF HR -->
-            <div id="tab-admin" class="erp-tab-section hidden space-y-6">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-3">
-                        <h3 class="font-bold text-slate-800 text-sm border-b pb-2">💸 Log Office Expense</h3>
-                        <form id="expenseForm" class="space-y-2.5 text-xs font-semibold" onsubmit="submitExpense(event)">
-                            <select id="expCategory" class="w-full p-2.5 bg-slate-50 border rounded-xl">
-                                <option value="Office Rent & Utilities">Office Rent & Utilities</option>
-                                <option value="Marketing & Ads">Marketing & Ads</option>
-                                <option value="Staff Salary & Bonus">Staff Salary & Bonus</option>
-                                <option value="Internet & Misc">Internet & Misc</option>
-                            </select>
-                            <input type="text" id="expDesc" required placeholder="Expense Description" class="w-full p-2.5 bg-slate-50 border rounded-xl">
-                            <div class="grid grid-cols-2 gap-2">
-                                <input type="number" id="expAmount" required placeholder="Amount (BDT)" class="w-full p-2.5 bg-slate-50 border rounded-xl text-red-600 font-bold">
-                                <input type="date" id="expDate" required class="w-full p-2.5 bg-slate-50 border rounded-xl">
-                            </div>
-                            <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold p-3 rounded-xl">🧾 Save Expense</button>
-                        </form>
-                    </div>
-
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-3">
-                        <h3 class="font-bold text-slate-800 text-sm border-b pb-2">👔 Hire New Staff / Consultant</h3>
-                        <form id="staffForm" class="space-y-2.5 text-xs font-semibold" onsubmit="submitEmployee(event)">
-                            <input type="text" id="empName" required placeholder="Staff Full Name" class="w-full p-2.5 bg-slate-50 border rounded-xl">
-                            <div class="grid grid-cols-2 gap-2">
-                                <input type="email" id="empEmail" required placeholder="Login Email" class="w-full p-2.5 bg-slate-50 border rounded-xl">
-                                <input type="text" id="empPass" required placeholder="Password" class="w-full p-2.5 bg-slate-50 border rounded-xl">
-                            </div>
-                            <div class="grid grid-cols-3 gap-2">
-                                <input type="text" id="empRole" required placeholder="Job Role" class="w-full p-2.5 bg-slate-50 border rounded-xl">
-                                <input type="number" id="empSalary" required placeholder="Base BDT" class="w-full p-2.5 bg-slate-50 border rounded-xl">
-                                <input type="number" step="0.1" id="empComm" required placeholder="Comm %" class="w-full p-2.5 bg-slate-50 border rounded-xl">
-                            </div>
-                            <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold p-3 rounded-xl">➕ Add Staff</button>
-                        </form>
-                    </div>
+            <!-- 2 Visual Graphs -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                <div class="lg:col-span-2 bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-sm">
+                    <h3 class="text-xs font-semibold text-zinc-700 mb-3">Department Revenue vs. Net Profit (BDT)</h3>
+                    <div class="h-64"><canvas id="revenueBarChart"></canvas></div>
                 </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
-                        <div class="p-3.5 bg-slate-50 border-b font-bold text-xs text-slate-800">📉 Office Expenses Ledger</div>
-                        <div class="overflow-x-auto"><table class="w-full text-left text-xs"><tbody id="expenseTableBody" class="divide-y"></tbody></table></div>
-                    </div>
-                    <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
-                        <div class="p-3.5 bg-slate-50 border-b font-bold text-xs text-slate-800">🏢 Staff Roster & Contracts</div>
-                        <div class="overflow-x-auto"><table class="w-full text-left text-xs"><tbody id="staffTableBody" class="divide-y"></tbody></table></div>
-                    </div>
+                <div class="bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-sm">
+                    <h3 class="text-xs font-semibold text-zinc-700 mb-3">Booking Volume Share</h3>
+                    <div class="h-64"><canvas id="serviceDoughnutChart"></canvas></div>
                 </div>
             </div>
 
-        </main>
-    </div>
+            <!-- Consultant Payroll Bar -->
+            <div class="bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-sm space-y-4">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-zinc-100 pb-3">
+                    <div>
+                        <span class="text-[10px] uppercase tracking-wider text-zinc-400 font-semibold">Active Consultant Payroll</span>
+                        <h3 class="text-base font-bold text-zinc-900"><span id="agentName">Loading...</span> <span id="agentRole" class="text-xs font-normal text-zinc-500"></span></h3>
+                    </div>
+                    <div id="staffSwitcherBar" class="flex flex-wrap gap-1.5"></div>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                    <div class="bg-zinc-50 p-3.5 rounded-xl"><span class="text-zinc-400 block">Base Salary</span><strong id="cardBaseSalary" class="text-sm text-zinc-900">BDT 0.00</strong></div>
+                    <div class="bg-zinc-50 p-3.5 rounded-xl"><span class="text-zinc-400 block">Sales Margin</span><strong id="salesMargin" class="text-sm text-emerald-600">BDT 0.00</strong></div>
+                    <div class="bg-zinc-50 p-3.5 rounded-xl"><span class="text-zinc-400 block">Commission Earned</span><strong id="cardCommEarned" class="text-sm text-blue-600">BDT 0.00</strong></div>
+                    <div class="bg-zinc-900 text-white p-3.5 rounded-xl"><span class="text-zinc-400 block">Net Payable</span><strong id="netPayout" class="text-sm">BDT 0.00</strong></div>
+                </div>
+            </div>
 
-    <!-- Printable Client Invoice Modal -->
-    <div id="invoiceModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border space-y-4" id="printableReceipt">
-            <div class="flex justify-between items-start border-b pb-3">
-                <div>
-                    <h2 class="text-lg font-black text-emerald-800">🕋 CM Travels & Tours</h2>
-                    <p class="text-[10px] text-slate-500">Jam-Jam Shopping Center (2nd Floor), 97, West Kafrul, Taltala, Sher-E-Bangla Nagar, Dhaka</p>
-                </div>
-                <div class="text-right">
-                    <p id="invNumber" class="text-xs font-mono font-bold text-slate-800">INV-001</p>
-                    <p id="invDate" class="text-[10px] text-slate-400">Date: --</p>
-                </div>
-            </div>
-            <div class="bg-slate-50 p-3 rounded-xl text-xs flex justify-between">
-                <div><span class="text-[9px] text-slate-400 block uppercase font-bold">Billed To</span><span id="invClient" class="font-bold text-slate-800">Client</span></div>
-                <div class="text-right"><span class="text-[9px] text-slate-400 block uppercase font-bold">Issued By</span><span id="invAgent" class="font-semibold text-slate-700">Agent</span></div>
-            </div>
-            <table class="w-full text-left text-xs">
-                <tbody class="divide-y">
-                    <tr>
-                        <td class="py-2.5"><div id="invServiceTitle" class="font-bold text-slate-800">Service</div><div id="invServiceSub" class="text-[10px] text-slate-500">Details</div></td>
-                        <td id="invAmount" class="py-2.5 text-right font-mono font-bold">BDT 0.00</td>
-                    </tr>
-                </tbody>
-                <tfoot>
-                    <tr class="border-t"><td class="py-2 font-bold text-slate-600">Total Bill</td><td id="invTotal" class="py-2 text-right font-mono font-bold">BDT 0.00</td></tr>
-                    <tr><td class="py-2 font-bold text-emerald-700">Paid Received</td><td id="invPaid" class="py-2 text-right font-mono font-bold text-emerald-700">BDT 0.00</td></tr>
-                    <tr class="border-t-2 border-slate-800 bg-amber-50"><td class="p-2.5 font-extrabold">Balance Due</td><td id="invDue" class="p-2.5 text-right font-mono font-black text-red-600">BDT 0.00</td></tr>
-                </tfoot>
-            </table>
-            <div class="flex gap-2 pt-2 print:hidden">
-                <button onclick="printInvoice()" class="flex-1 bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs">🖨️ Print / Save PDF</button>
-                <button onclick="closeInvoice()" class="px-4 bg-slate-100 text-slate-700 font-bold py-2.5 rounded-xl text-xs">Close</button>
-            </div>
         </div>
-    </div>
-
-    <footer class="text-center py-4 text-[11px] text-slate-400 border-t bg-white mt-auto">&copy; 2026 CM Travels & Tours • Jam-Jam Shopping Center (2nd Floor), 97, West Kafrul, Taltala, Dhaka.</footer>
-    <script src="app.js"></script>
-</body>
-</html>
