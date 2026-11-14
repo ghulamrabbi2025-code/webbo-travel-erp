@@ -111,13 +111,38 @@ async function submitEmployee(e) {
         baseSalary: document.getElementById('empSalary').value,
         commissionRate: document.getElementById('empComm').value
     };
-    const res = await fetch(`${API_BASE_URL}/api/employee/add`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-    if ((await res.json()).success) {
-        alert("✅ New staff hired!");
-        e.target.reset();
-        loadEmployees();
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/employee/add`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+        if (result.success) {
+            alert(`✅ ${result.employee.name} added to staff list!`);
+            e.target.reset();
+            loadEmployees();
+        } else {
+            alert("Database Error: " + (result.error || "Could not add employee"));
+        }
+    } catch (err) {
+        alert("Server waking up—wait 30 seconds and click Add Staff again.");
     }
 }
+
+function refreshAll() {
+    loadDashboardStats();
+    loadVisas();
+    loadTickets();
+    loadHotels();
+    loadPackages();
+    loadExpenses();
+}
+
+currentAgentId = 1;
+loadEmployees();
+loadCustomers();
+refreshAll();
 
 async function editEmployee(id, oldName, oldRole, oldSal, oldComm) {
     const name = prompt("Staff Name:", oldName); if (!name) return;
