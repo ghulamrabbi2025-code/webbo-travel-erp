@@ -216,12 +216,18 @@ res.json(r.rows);
 } catch (err) { res.status(500).json({ error: err.message }); }
 });
 app.post('/api/employee/add', async (req, res) => {
-const { name, email, role, baseSalary, commissionRate } = req.body;
-try {
-const r = await pool.query("INSERT INTO employees (name, email, role, base_salary, commission_rate) VALUES ($1,$2,$3,$4,$5) RETURNING employee_id, name", [name, email.trim(), role, parseFloat(baseSalary), parseFloat(commissionRate)]);
-res.status(201).json({ success: true, employee: r.rows.at(0) });
-} catch (err) { res.status(500).json({ error: err.message }); }
+  const { name, email, role, baseSalary, commissionRate } = req.body;
+  try {
+    const r = await pool.query(
+      "INSERT INTO employees (name, email, role, base_salary, commission_rate, password) VALUES ($1,$2,$3,$4,$5,'open') RETURNING employee_id, name",
+      [name, email.trim(), role, parseFloat(baseSalary), parseFloat(commissionRate)]
+    );
+    res.status(201).json({ success: true, employee: r.rows.at(0) });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
+
 app.put('/api/employee/update/:id', async (req, res) => {
 const { name, role, baseSalary, commissionRate } = req.body;
 try {
