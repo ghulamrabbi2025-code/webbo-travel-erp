@@ -1,2 +1,58 @@
-Block 1: Top Half (Header & Overview Tab) contains the main structure, agency header, KPI cards (Total Sales, Operating Profit, Customer Due, Expenses), service stats, and consultant payroll summary.
-• Block 2: Bottom Half (All Other Tabs, Floating Dock & Scripts) contains the forms and ledgers for Visas & Tickets, Hotels & Packages, Clients/Passports, Office Expenses & HR, the bottom navigation dock, invoice modal, and link to app.js.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CM Travels & Tours ERP</title>
+    <script src="https://tailwindcss.com"></script>
+</head>
+<body class="bg-[#E5E7EB] text-zinc-800 min-h-screen pb-24 antialiased">
+    <header class="bg-white/90 backdrop-blur-md border-b border-zinc-200/80 sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-6 py-3.5 flex justify-between items-center">
+            <div class="flex items-center gap-2.5">
+                <span class="text-lg">🕋</span>
+                <h1 class="text-base font-bold text-zinc-900 tracking-tight">CM Travels & Tours ERP</h1>
+            </div>
+            <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-semibold px-2.5 py-0.5 rounded-full">Live</span>
+        </div>
+    </header>
+    <main class="max-w-7xl mx-auto px-4 md:px-6 pt-6 space-y-6">
+        <div id="tab-overview" class="erp-tab-section space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-2xl border-l-4 border-l-zinc-900 shadow-sm">
+                    <span class="text-[11px] font-semibold text-zinc-400 uppercase">Total Agency Sales</span>
+                    <h3 id="kpiTotalSales" class="text-xl font-extrabold text-zinc-900 mt-1">BDT 0.00</h3>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border-l-4 border-l-emerald-500 shadow-sm">
+                    <span class="text-[11px] font-semibold text-zinc-400 uppercase">Operating Profit</span>
+                    <h3 id="kpiOpProfit" class="text-xl font-extrabold text-emerald-600 mt-1">BDT 0.00</h3>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border-l-4 border-l-amber-500 shadow-sm">
+                    <span class="text-[11px] font-semibold text-zinc-400 uppercase">Customer Due Receivable</span>
+                    <h3 id="kpiCustDue" class="text-xl font-extrabold text-amber-600 mt-1">BDT 0.00</h3>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border-l-4 border-l-rose-500 shadow-sm">
+                    <span class="text-[11px] font-semibold text-zinc-400 uppercase">Last Month Expenses</span>
+                    <h3 id="kpiLastMonthExp" class="text-xl font-extrabold text-rose-600 mt-1">BDT 0.00</h3>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
+            <!-- Department Stats & Consultant Payroll Grid -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Stat Cards for Visa, Air Tickets, Hotel Bookings, and Tour Packages -->
+                ...
+            </div>
+            <!-- Active Consultant Payroll Section -->
+            ...
+        </div>
+
+        <!-- Visas & Air Tickets Tab -->
+        <div id="tab-bookings" class="erp-tab-section hidden space-y-6">
+            <!-- Visa & Flight Ticket Log Forms and Ledgers -->
+            ...
+        </div>
+To complete index.html, append the remaining code blocks for the Hotels & Packages (tab-hotels), Clients & Passports (tab-clients), and Expenses & Staff HR (tab-admin) sections, followed by the fixed bottom navigation dock, the printable invoice modal, and the closing script tag for app.js.
+The full template and setup code can be referenced directly from the source repository configuration.
