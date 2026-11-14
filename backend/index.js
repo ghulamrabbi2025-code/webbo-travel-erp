@@ -228,6 +228,7 @@ app.post('/api/employee/add', async (req, res) => {
   }
 });
 
+
 app.put('/api/employee/update/:id', async (req, res) => {
 const { name, role, baseSalary, commissionRate } = req.body;
 try {
