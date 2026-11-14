@@ -240,30 +240,56 @@ Office Expenses Ledger
 
 Staff Roster & Contracts
 
+        </div>
 
+    </main>
 
-📊 Overview
-🛂 Visas & Tickets
-🏨 Hotels & Packages
-🗂️ Clients
-💸 Expenses & HR
-🕋 CM Travels & Tours
-Jam-Jam Shopping Center (2nd Floor), 97, West Kafrul, Taltala, Sher-E-Bangla Nagar, Dhaka
+    <!-- Compact Floating Dock -->
+    <nav style="position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:9999;" class="bg-white/95 backdrop-blur-xl border border-zinc-300 shadow-2xl px-3 py-2 rounded-full flex items-center gap-1.5 max-w-[95vw] overflow-x-auto">
+        <a onclick="switchTab('tab-overview')" id="btn-tab-overview" class="nav-tab-btn px-4 py-2 rounded-full text-xs font-semibold bg-zinc-900 text-white shadow-sm transition-all cursor-pointer whitespace-nowrap">📊 Overview</a>
+        <a onclick="switchTab('tab-bookings')" id="btn-tab-bookings" class="nav-tab-btn px-3.5 py-2 rounded-full text-xs font-medium text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 transition-all cursor-pointer whitespace-nowrap">🛂 Visas & Tickets</a>
+        <a onclick="switchTab('tab-hotels')" id="btn-tab-hotels" class="nav-tab-btn px-3.5 py-2 rounded-full text-xs font-medium text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 transition-all cursor-pointer whitespace-nowrap">🏨 Hotels & Packages</a>
+        <a onclick="switchTab('tab-clients')" id="btn-tab-clients" class="nav-tab-btn px-3.5 py-2 rounded-full text-xs font-medium text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 transition-all cursor-pointer whitespace-nowrap">🗂️ Clients</a>
+        <a onclick="switchTab('tab-admin')" id="btn-tab-admin" class="nav-tab-btn px-3.5 py-2 rounded-full text-xs font-medium text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 transition-all cursor-pointer whitespace-nowrap">💸 Expenses & HR</a>
+    </nav>
 
+    <!-- Printable Client Invoice Modal -->
+    <div id="invoiceModal" class="hidden fixed inset-0 bg-zinc-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-zinc-200 space-y-4" id="printableReceipt">
+            <div class="flex justify-between items-start border-b border-zinc-100 pb-3">
+                <div>
+                    <h2 class="text-lg font-bold text-zinc-900">🕋 CM Travels & Tours</h2>
+                    <p class="text-[10px] text-zinc-500">Jam-Jam Shopping Center (2nd Floor), 97, West Kafrul, Taltala, Sher-E-Bangla Nagar, Dhaka</p>
+                </div>
+                <div class="text-right">
+                    <p id="invNumber" class="text-xs font-mono font-bold text-zinc-800">INV-001</p>
+                    <p id="invDate" class="text-[10px] text-zinc-400">Date: --</p>
+                </div>
+            </div>
+            <div class="bg-zinc-50 p-3 rounded-xl text-xs flex justify-between">
+                <div><span class="text-[9px] text-zinc-400 block uppercase font-semibold">Billed To</span><span id="invClient" class="font-bold text-zinc-800">Client</span></div>
+                <div class="text-right"><span class="text-[9px] text-zinc-400 block uppercase font-semibold">Issued By</span><span id="invAgent" class="font-semibold text-zinc-700">Agent</span></div>
+            </div>
+            <table class="w-full text-left text-xs">
+                <tbody class="divide-y divide-zinc-100">
+                    <tr>
+                        <td class="py-2.5"><div id="invServiceTitle" class="font-bold text-zinc-800">Service</div><div id="invServiceSub" class="text-[10px] text-zinc-500">Details</div></td>
+                        <td id="invAmount" class="py-2.5 text-right font-mono font-bold">BDT 0.00</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr class="border-t border-zinc-200"><td class="py-2 font-semibold text-zinc-600">Total Bill</td><td id="invTotal" class="py-2 text-right font-mono font-bold">BDT 0.00</td></tr>
+                    <tr><td class="py-2 font-semibold text-emerald-700">Paid Received</td><td id="invPaid" class="py-2 text-right font-mono font-bold text-emerald-700">BDT 0.00</td></tr>
+                    <tr class="border-t-2 border-zinc-900 bg-zinc-50"><td class="p-2.5 font-bold">Balance Due</td><td id="invDue" class="p-2.5 text-right font-mono font-bold text-rose-600">BDT 0.00</td></tr>
+                </tfoot>
+            </table>
+            <div class="flex gap-2 pt-2 print:hidden">
+                <button onclick="printInvoice()" class="flex-1 bg-zinc-900 text-white font-medium py-2.5 rounded-xl text-xs">🖨️ Print / Save PDF</button>
+                <button onclick="closeInvoice()" class="px-4 bg-zinc-100 text-zinc-700 font-medium py-2.5 rounded-xl text-xs">Close</button>
+            </div>
+        </div>
+    </div>
 
-INV-001
-Date: --
-
-
-
-Billed ToClient
-Issued ByAgent
-
-	BDT 0.00
-
-🖨️ Print / Save PDF
-Close
     <script src="app.js"></script>
 </body>
 </html>
-
