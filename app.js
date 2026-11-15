@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://onrender.com";
+const API_BASE_URL = "https://" + "webbo-travel-erp-backend" + ".onrender.com";
 let currentAgentId = 1;
 
 function switchTab(tabId) {
