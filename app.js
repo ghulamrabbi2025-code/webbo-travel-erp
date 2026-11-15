@@ -53,32 +53,37 @@ async function loadAgentData(id) {
         }
     } catch (err) { console.error(err); }
 }
-
 async function loadEmployees() {
     const switcher = document.getElementById('staffSwitcherBar');
+    if (switcher) switcher.innerHTML = '<span class="text-xs text-gray-400">Loading staff...</span>';
     try {
         const res = await fetch(`${API_BASE_URL}/api/employees`);
         const employees = await res.json();
         if (switcher) {
-            switcher.innerHTML = employees.map(emp => {
-                const cls = emp.employee_id === currentAgentId
-                    ? "px-3.5 py-2 bg-zinc-900 text-white rounded-lg text-xs font-bold shadow cursor-pointer"
-                    : "px-3.5 py-2 bg-zinc-100 text-zinc-700 rounded-lg text-xs font-semibold hover:bg-zinc-200 cursor-pointer";
-                return `<button onclick="switchAgent(${emp.employee_id})" class="${cls}">${emp.name}</button>`;
-            }).join('');
+            switcher.innerHTML = employees.length > 0
+                ? employees.map(emp => {
+                    const isAct = emp.employee_id === currentAgentId;
+                    const st = isAct
+                        ? "background:#18181B; color:#fff; padding:6px 14px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer;"
+                        : "background:#F4F4F5; color:#27272A; padding:6px 14px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; border:1px solid #E4E4E7;";
+                    return `<button onclick="switchAgent(${emp.employee_id})" style="${st}">${emp.name}</button>`;
+                }).join('')
+                : '<span class="text-xs text-red-500">No employees in database</span>';
         }
         const tbody = document.getElementById('staffTableBody');
         if (tbody) {
             tbody.innerHTML = employees.map(emp => `
-                <tr class="hover:bg-zinc-50">
-                    <td class="p-3 font-bold text-zinc-800">#${emp.employee_id} ${emp.name}</td>
-                    <td class="p-3"><div class="font-semibold text-zinc-700">${emp.role}</div><div class="text-[10px] text-zinc-400">${emp.email}</div></td>
-                    <td class="p-3 font-mono font-bold text-zinc-700">BDT ${parseFloat(emp.base_salary).toLocaleString()}</td>
-                    <td class="p-3 font-bold text-emerald-700">${parseFloat(emp.commission_rate)}%</td>
-                    <td class="p-3 text-right"><button onclick="editEmployee(${emp.employee_id}, '${emp.name}', '${emp.role}', ${emp.base_salary}, ${emp.commission_rate})" class="px-2.5 py-1 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 rounded-lg text-[11px] font-bold">✏️ Edit</button></td>
+                <tr class="hover:bg-gray-50">
+                    <td class="p-3 font-bold text-gray-800">#${emp.employee_id} ${emp.name}</td>
+                    <td class="p-3"><div class="font-semibold text-gray-700">${emp.role}</div><div class="text-xs text-gray-400">${emp.email}</div></td>
+                    <td class="p-3 font-mono font-bold text-gray-700">BDT ${parseFloat(emp.base_salary).toLocaleString()}</td>
+                    <td class="p-3 font-bold text-green-700">${parseFloat(emp.commission_rate)}%</td>
+                    <td class="p-3 text-right"><button onclick="editEmployee(${emp.employee_id}, '${emp.name}', '${emp.role}', ${emp.base_salary}, ${emp.commission_rate})" class="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-xs font-bold">✏️ Edit</button></td>
                 </tr>`).join('');
         }
-    } catch (err) { console.error(err); }
+    } catch (err) {
+        if (switcher) switcher.innerHTML = '<span class="text-xs text-red-500">Server waking up—refresh in 30s</span>';
+    }
 }
 
 function switchAgent(id) {
