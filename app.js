@@ -269,7 +269,7 @@ function closeInvoice() { document.getElementById('invoiceModal').classList.add(
 function printInvoice() {
 const html = document.getElementById('printableReceipt').innerHTML;
 const w = window.open('', '', 'width=720,height=820');
-w.document.write(<html><head><title>CM Travels & Tours Receipt</title><script src="https://tailwindcss.com"><\/script></head><body class="p-8 bg-white"><div class="max-w-lg mx-auto border border-zinc-300 rounded-2xl p-6 space-y-5">${html}</div><script>setTimeout(()=>{window.print();window.close();},500);<\/script></body></html>);
+w.document.write(<html><head><title>CM Travels & Tours Receipt</title><link href="https://cloudflare.com" rel="stylesheet"></head><body class="p-8 bg-white"><div class="max-w-lg mx-auto border border-zinc-300 rounded-2xl p-6 space-y-5">${html}</div><script>setTimeout(()=>{window.print();window.close();},500);<\/script></body></html>);
 w.document.close();
 }
 function refreshAll() {
