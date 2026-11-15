@@ -255,8 +255,14 @@ Issued ByAgent
 🖨️ Print / Save PDFClose
 				    </main>
 
-    <nav style="position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:9999;" class="bg-white/95 backdrop-blur-xl border border-zinc-300 shadow-2xl px-3 py-2 rounded-full flex items-center gap-1.5 max-w-[95vw] overflow-x-auto">
+    <nav style="position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:9999; background:rgba(255,255,255,0.95); border:1px solid #d4d4d8; box-shadow:0 10px 25px rgba(0,0,0,0.15); padding:8px 12px; border-radius:9999px; display:flex; gap:6px; max-width:95vw; overflow-x:auto;">
+        <a onclick="switchTab('tab-overview')" id="btn-tab-overview" class="nav-tab-btn px-4 py-2 rounded-full text-xs font-semibold bg-zinc-900 text-white cursor-pointer whitespace-nowrap">📊 Overview</a>
+        <a onclick="switchTab('tab-bookings')" id="btn-tab-bookings" class="nav-tab-btn px-3.5 py-2 rounded-full text-xs font-medium text-gray-600 hover:bg-gray-100 cursor-pointer whitespace-nowrap">🛂 Visas & Tickets</a>
+        <a onclick="switchTab('tab-hotels')" id="btn-tab-hotels" class="nav-tab-btn px-3.5 py-2 rounded-full text-xs font-medium text-gray-600 hover:bg-gray-100 cursor-pointer whitespace-nowrap">🏨 Hotels & Packages</a>
+        <a onclick="switchTab('tab-clients')" id="btn-tab-clients" class="nav-tab-btn px-3.5 py-2 rounded-full text-xs font-medium text-gray-600 hover:bg-gray-100 cursor-pointer whitespace-nowrap">🗂️ Clients</a>
+        <a onclick="switchTab('tab-admin')" id="btn-tab-admin" class="nav-tab-btn px-3.5 py-2 rounded-full text-xs font-medium text-gray-600 hover:bg-gray-100 cursor-pointer whitespace-nowrap">💸 Expenses & HR</a>
+    </nav>
 
- <script src="app.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
