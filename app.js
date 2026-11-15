@@ -14,6 +14,7 @@ function switchTab(tabId) {
         activeBtn.className = "nav-tab-btn px-4 py-2 rounded-full text-xs font-semibold bg-zinc-900 text-white shadow-sm transition-all cursor-pointer whitespace-nowrap";
     }
 }
+
 async function loadDashboardStats() {
     try {
         const res = await fetch(`${API_BASE_URL}/api/dashboard-stats`);
