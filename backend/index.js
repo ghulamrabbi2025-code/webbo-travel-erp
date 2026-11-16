@@ -34,16 +34,15 @@ async function initSchema() {
   } catch (e) { console.log("Schema sync:", e.message); }
 }
 initSchema();
-
 // 1. OVERVIEW STATS
 app.get('/api/dashboard-stats', async (req, res) => {
   try {
-    const v = (await pool.query("SELECT COUNT(*)::int as cnt, COALESCE(SUM(selling_price),0) as sales, COALESCE(SUM(margin_earned),0) as profit, COALESCE(SUM(selling_price - COALESCE(amount_paid, selling_price)),0) as due FROM visa_bookings")).rows[0];
-    const f = (await pool.query("SELECT COUNT(*)::int as cnt, COALESCE(SUM(selling_price),0) as sales, COALESCE(SUM(margin_earned),0) as profit, COALESCE(SUM(selling_price - COALESCE(amount_paid, selling_price)),0) as due FROM flight_tickets")).rows[0];
-    const h = (await pool.query("SELECT COUNT(*)::int as cnt, COALESCE(SUM(selling_price),0) as sales, COALESCE(SUM(margin_earned),0) as profit, COALESCE(SUM(selling_price - COALESCE(amount_paid, selling_price)),0) as due FROM hotel_bookings")).rows[0];
-    const p = (await pool.query("SELECT COUNT(*)::int as cnt, COALESCE(SUM(selling_price),0) as sales, COALESCE(SUM(margin_earned),0) as profit, COALESCE(SUM(selling_price - COALESCE(amount_paid, selling_price)),0) as due FROM tour_packages")).rows[0];
-    const expAll = parseFloat((await pool.query("SELECT COALESCE(SUM(amount),0) as total FROM office_expenses")).rows[0].total);
-    const exp30 = parseFloat((await pool.query("SELECT COALESCE(SUM(amount),0) as total FROM office_expenses WHERE expense_date >= CURRENT_DATE - INTERVAL '30 days'")).rows[0].total);
+    const v = (await pool.query("SELECT COUNT(*)::int as cnt, COALESCE(SUM(selling_price),0) as sales, COALESCE(SUM(margin_earned),0) as profit, COALESCE(SUM(selling_price - COALESCE(amount_paid, selling_price)),0) as due FROM visa_bookings")).rows.at(0);
+    const f = (await pool.query("SELECT COUNT(*)::int as cnt, COALESCE(SUM(selling_price),0) as sales, COALESCE(SUM(margin_earned),0) as profit, COALESCE(SUM(selling_price - COALESCE(amount_paid, selling_price)),0) as due FROM flight_tickets")).rows.at(0);
+    const h = (await pool.query("SELECT COUNT(*)::int as cnt, COALESCE(SUM(selling_price),0) as sales, COALESCE(SUM(margin_earned),0) as profit, COALESCE(SUM(selling_price - COALESCE(amount_paid, selling_price)),0) as due FROM hotel_bookings")).rows.at(0);
+    const p = (await pool.query("SELECT COUNT(*)::int as cnt, COALESCE(SUM(selling_price),0) as sales, COALESCE(SUM(margin_earned),0) as profit, COALESCE(SUM(selling_price - COALESCE(amount_paid, selling_price)),0) as due FROM tour_packages")).rows.at(0);
+    const expAll = parseFloat((await pool.query("SELECT COALESCE(SUM(amount),0) as total FROM office_expenses")).rows.at(0).total);
+    const exp30 = parseFloat((await pool.query("SELECT COALESCE(SUM(amount),0) as total FROM office_expenses WHERE expense_date >= CURRENT_DATE - INTERVAL '30 days'")).rows.at(0).total);
 
     const totalSales = parseFloat(v.sales) + parseFloat(f.sales) + parseFloat(h.sales) + parseFloat(p.sales);
     const grossProfit = parseFloat(v.profit) + parseFloat(f.profit) + parseFloat(h.profit) + parseFloat(p.profit);
@@ -67,12 +66,12 @@ app.get('/api/payroll/:employeeId', async (req, res) => {
   try {
     const empRes = await pool.query("SELECT * FROM employees WHERE employee_id = $1", [id]);
     if (!empRes.rows.length) return res.status(404).json({ error: 'Not found' });
-    const emp = empRes.rows[0];
+    const emp = empRes.rows.at(0);
 
-    const vM = parseFloat((await pool.query("SELECT COALESCE(SUM(margin_earned),0) as s FROM visa_bookings WHERE employee_id=$1", [id])).rows[0].s);
-    const fM = parseFloat((await pool.query("SELECT COALESCE(SUM(margin_earned),0) as s FROM flight_tickets WHERE employee_id=$1", [id])).rows[0].s);
-    const hM = parseFloat((await pool.query("SELECT COALESCE(SUM(margin_earned),0) as s FROM hotel_bookings WHERE employee_id=$1", [id])).rows[0].s);
-    const pM = parseFloat((await pool.query("SELECT COALESCE(SUM(margin_earned),0) as s FROM tour_packages WHERE employee_id=$1", [id])).rows[0].s);
+    const vM = parseFloat((await pool.query("SELECT COALESCE(SUM(margin_earned),0) as s FROM visa_bookings WHERE employee_id=$1", [id])).rows.at(0).s);
+    const fM = parseFloat((await pool.query("SELECT COALESCE(SUM(margin_earned),0) as s FROM flight_tickets WHERE employee_id=$1", [id])).rows.at(0).s);
+    const hM = parseFloat((await pool.query("SELECT COALESCE(SUM(margin_earned),0) as s FROM hotel_bookings WHERE employee_id=$1", [id])).rows.at(0).s);
+    const pM = parseFloat((await pool.query("SELECT COALESCE(SUM(margin_earned),0) as s FROM tour_packages WHERE employee_id=$1", [id])).rows.at(0).s);
 
     const totalMargin = vM + fM + hM + pM;
     const commissionEarned = totalMargin * (parseFloat(emp.commission_rate) / 100);
