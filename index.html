@@ -1,5 +1,104 @@
-The complete, raw HTML for Part 1 (including the head tag, header, and tabs for Overview, Client, Passport, and Visa) can be copied and pasted directly from the provided source block in the documentation github.com.        <!-- TAB 5: TICKET -->
-        <div id="tab-ticket" class="erp-tab-section hidden space-y-6">
+<!DOCTYPE html>
+<html lang="en">
+<!-- Header, Tailwind CSS imports, and Overview tab structure for CM Travels & Tours ERP -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CM Travels & Tours ERP</title>
+    <link href="https://cloudflare.com" rel="stylesheet">
+</head>
+<body class="min-h-screen pb-24 antialiased">
+    <!-- Header and Overview Tab Content -->
+</body>
+</html>
+        <!-- TAB 2: CLIENT -->
+        <div id="tab-client" class="erp-tab-section hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                <div class="bg-white p-5 rounded-2xl border shadow-sm space-y-3">
+                    <h3 class="font-bold text-gray-900 text-sm border-b pb-2">Add New Client</h3>
+                    <form class="space-y-2.5 text-xs" onsubmit="submitCustomer(event)">
+                        <input type="text" id="custName" required placeholder="Full Name" class="w-full p-2.5 bg-gray-50 border rounded-xl">
+                        <input type="text" id="custPhone" required placeholder="Mobile Number (+8801...)" class="w-full p-2.5 bg-gray-50 border rounded-xl">
+                        <input type="text" id="custCompany" placeholder="Company / Reference (Optional)" class="w-full p-2.5 bg-gray-50 border rounded-xl">
+                        <button type="submit" class="w-full bg-zinc-900 text-white font-semibold p-3 rounded-xl">Save Client</button>
+                    </form>
+                </div>
+                <div class="lg:col-span-2 bg-white rounded-2xl border shadow-sm overflow-hidden">
+                    <div class="p-3.5 bg-gray-50 border-b font-bold text-xs text-gray-700">Client Directory</div>
+                    <table class="w-full text-left text-xs"><tbody id="customerTableBody" class="divide-y"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: PASSPORT -->
+        <div id="tab-passport" class="erp-tab-section hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                <div class="bg-white p-5 rounded-2xl border shadow-sm space-y-3">
+                    <h3 class="font-bold text-gray-900 text-sm border-b pb-2">Log Passport</h3>
+                    <form class="space-y-2.5 text-xs" onsubmit="submitPassport(event)">
+                        <select id="passClientCombo" class="client-combo w-full p-2.5 bg-gray-50 border rounded-xl">
+                            <option value="">-- Select Client (Optional) --</option>
+                        </select>
+                        <input type="text" id="passHolderName" required placeholder="Passport Holder Name" class="w-full p-2.5 bg-gray-50 border rounded-xl">
+                        <input type="text" id="passPhone" placeholder="Mobile Number" class="w-full p-2.5 bg-gray-50 border rounded-xl">
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="text" id="passNumber" required placeholder="Passport No." class="w-full p-2.5 bg-gray-50 border rounded-xl uppercase font-mono">
+                            <input type="date" id="passExpiry" required class="w-full p-2.5 bg-gray-50 border rounded-xl">
+                        </div>
+                        <button type="submit" class="w-full bg-zinc-900 text-white font-semibold p-3 rounded-xl">Save Passport</button>
+                    </form>
+                </div>
+                <div class="lg:col-span-2 bg-white rounded-2xl border shadow-sm overflow-hidden">
+                    <div class="p-3.5 bg-gray-50 border-b font-bold text-xs text-gray-700">Passport Registry</div>
+                    <table class="w-full text-left text-xs"><tbody id="passportTableBody" class="divide-y"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: VISA -->
+        <div id="tab-visa" class="erp-tab-section hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                <div class="bg-white p-5 rounded-2xl border shadow-sm space-y-3">
+                    <h3 class="font-bold text-gray-900 text-sm border-b pb-2">Process Visa</h3>
+                    <form class="space-y-2.5 text-xs" onsubmit="submitVisa(event)">
+                        <select id="visaClientCombo" class="client-combo w-full p-2.5 bg-gray-50 border rounded-xl">
+                            <option value="">-- Select Client --</option>
+                        </select>
+                        <select id="visaEmpCombo" class="emp-combo w-full p-2.5 bg-gray-50 border rounded-xl">
+                            <option value="">-- Select Employee --</option>
+                        </select>
+                        <select id="visaSupplier" class="w-full p-2.5 bg-gray-50 border rounded-xl">
+                            <option value="Direct Embassy / VFS">Direct Embassy / VFS</option>
+                            <option value="Saudi MoFA / Enjaz">Saudi MoFA / Enjaz</option>
+                            <option value="UAE GDRFA / ICP">UAE GDRFA / ICP</option>
+                            <option value="B2B Visa Agent">B2B Visa Agent</option>
+                        </select>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="text" id="visaCountry" required value="Saudi Arabia" placeholder="Country" class="w-full p-2.5 bg-gray-50 border rounded-xl">
+                            <select id="visaTypeCombo" class="w-full p-2.5 bg-gray-50 border rounded-xl">
+                                <option value="Umrah Visa">Umrah Visa</option>
+                                <option value="Hajj Visa">Hajj Visa</option>
+                                <option value="Tourist Visa">Tourist Visa</option>
+                                <option value="Work / Employment Visa">Work / Employment Visa</option>
+                                <option value="Medical Visa">Medical Visa</option>
+                                <option value="Student Visa">Student Visa</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <input type="number" id="visaCost" required placeholder="Net Cost" class="w-full p-2.5 bg-gray-50 border rounded-xl text-red-600 font-semibold">
+                            <input type="number" id="visaPrice" required placeholder="Selling" class="w-full p-2.5 bg-gray-50 border rounded-xl text-green-600 font-semibold">
+                            <input type="number" id="visaPaid" placeholder="Paid Now" class="w-full p-2.5 bg-gray-50 border rounded-xl font-semibold">
+                        </div>
+                        <button type="submit" class="w-full bg-zinc-900 text-white font-semibold p-3 rounded-xl">Save Visa</button>
+                    </form>
+                </div>
+                <div class="lg:col-span-2 bg-white rounded-2xl border shadow-sm overflow-hidden">
+                    <div class="p-3.5 bg-gray-50 border-b font-bold text-xs text-gray-700">Visa Processing Ledger</div>
+                    <table class="w-full text-left text-xs"><tbody id="visaTableBody" class="divide-y"></tbody></table>
+                </div>
+            </div>
+        </div>
+<div id="tab-ticket" class="erp-tab-section hidden space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
                 <div class="bg-white p-5 rounded-2xl border shadow-sm space-y-3">
                     <h3 class="font-bold text-gray-900 text-sm border-b pb-2">Issue Air Ticket</h3>
