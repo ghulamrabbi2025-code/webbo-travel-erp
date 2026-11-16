@@ -4,11 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CM Travels & Tours ERP</title>
-    <link href="https://jsdelivr.net" rel="stylesheet">
     <style>
-        body { background-color: #E5E7EB; color: #27272A; font-family: system-ui, -apple-system, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+        body { background-color: #E5E7EB; color: #27272A; padding-bottom: 90px; }
         .hidden { display: none !important; }
-        .bg-zinc-900 { background-color: #18181B !important; color: #FFFFFF !important; }
+        header { background: #FFFFFF; border-bottom: 1px solid #E4E4E7; position: sticky; top: 0; z-index: 30; }
+        header > div { max-width: 1200px; margin: 0 auto; padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; }
+        main { max-width: 1200px; margin: 0 auto; padding: 24px 16px; }
+        .space-y-6 > * + * { margin-top: 24px; }
+        .space-y-4 > * + * { margin-top: 16px; }
+        .space-y-3 > * + * { margin-top: 12px; }
+        .space-y-2\.5 > * + * { margin-top: 10px; }
+        .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+        .bg-white { background: #FFFFFF; border: 1px solid #E4E4E7; }
+        .bg-green-50 { background: #ECFDF5; border: 1px solid #A7F3D0; }
+        .bg-blue-50 { background: #EFF6FF; border: 1px solid #BFDBFE; }
+        .bg-indigo-50 { background: #EEF2FF; border: 1px solid #C7D2FE; }
+        .bg-purple-50 { background: #FAF5FF; border: 1px solid #E9D5FF; }
+        .bg-gray-50 { background: #FAFAFA; }
+        .bg-gray-100 { background: #F4F4F5; }
+        .bg-zinc-900 { background: #18181B !important; color: #FFFFFF !important; }
+        .rounded-2xl { border-radius: 16px; }
+        .rounded-xl { border-radius: 12px; }
+        .rounded-full { border-radius: 9999px; }
+        .p-5 { padding: 20px; }
+        .p-4 { padding: 16px; }
+        .p-3\.5 { padding: 14px; }
+        .p-3 { padding: 12px; }
+        .p-2\.5 { padding: 10px; }
+        .px-3\.5 { padding-left: 14px; padding-right: 14px; }
+        .px-3 { padding-left: 12px; padding-right: 12px; }
+        .py-1\.5 { padding-top: 6px; padding-bottom: 6px; }
+        .text-xl { font-size: 20px; font-weight: 800; margin-top: 4px; }
+        .text-base { font-size: 16px; font-weight: 700; }
+        .text-sm { font-size: 14px; }
+        .text-xs { font-size: 12px; }
+        .text-green-600, .text-green-700, .text-green-800 { color: #059669; }
+        .text-blue-700, .text-blue-800 { color: #1D4ED8; }
+        .text-indigo-800 { color: #3730A3; }
+        .text-purple-800 { color: #6B21A8; }
+        .text-yellow-600 { color: #D97706; }
+        .text-red-600 { color: #DC2626; }
+        .text-gray-400, .text-gray-500 { color: #71717A; }
+        input, select { width: 100%; border: 1px solid #D4D4D8; border-radius: 10px; padding: 9px 12px; font-size: 12px; background: #FAFAFA; }
+        button { cursor: pointer; border: none; border-radius: 10px; font-size: 12px; font-weight: 600; }
+        table { width: 100%; border-collapse: collapse; }
+        td, th { padding: 10px 12px; border-bottom: 1px solid #F4F4F5; text-align: left; }
+        .flex { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .justify-between { justify-content: space-between; }
     </style>
 </head>
 <body class="min-h-screen pb-24 antialiased">
