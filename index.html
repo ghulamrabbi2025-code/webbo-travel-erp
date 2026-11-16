@@ -1,1 +1,178 @@
 The complete HTML structure for Part 1 containing the header, dashboard metrics, and forms/tables for the Overview, Client, Passport, and Visa modules can be found in the referenced code block above.
+        <!-- TAB 5: TICKET -->
+        <div id="tab-ticket" class="erp-tab-section hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                <div class="bg-white p-5 rounded-2xl border shadow-sm space-y-3">
+                    <h3 class="font-bold text-gray-900 text-sm border-b pb-2">Issue Air Ticket</h3>
+                    <form class="space-y-2.5 text-xs" onsubmit="submitTicket(event)">
+                        <select id="ticketClientCombo" class="client-combo w-full p-2.5 bg-gray-50 border rounded-xl"></select>
+                        <select id="ticketEmpCombo" class="emp-combo w-full p-2.5 bg-gray-50 border rounded-xl"></select>
+                        <select id="ticketSupplier" class="w-full p-2.5 bg-gray-50 border rounded-xl">
+                            <option value="Sabre GDS">Sabre GDS</option>
+                            <option value="Amadeus GDS">Amadeus GDS</option>
+                            <option value="Galileo GDS">Galileo GDS</option>
+                            <option value="B2B Portal">B2B Consolidator Portal</option>
+                        </select>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="text" id="gdsPnr" required placeholder="GDS PNR" class="w-full p-2.5 bg-gray-50 border rounded-xl uppercase">
+                            <input type="text" id="airlineCode" required placeholder="Airline (e.g. BG)" class="w-full p-2.5 bg-gray-50 border rounded-xl uppercase">
+                        </div>
+                        <input type="text" id="route" required placeholder="Route (e.g. DAC-DXB-JED)" class="w-full p-2.5 bg-gray-50 border rounded-xl uppercase">
+                        <div class="grid grid-cols-3 gap-2">
+                            <input type="number" id="ticketCost" required placeholder="Net Cost" class="w-full p-2.5 bg-gray-50 border rounded-xl text-red-600 font-semibold">
+                            <input type="number" id="ticketPrice" required placeholder="Selling" class="w-full p-2.5 bg-gray-50 border rounded-xl text-green-600 font-semibold">
+                            <input type="number" id="ticketPaid" placeholder="Paid Now" class="w-full p-2.5 bg-gray-50 border rounded-xl font-semibold">
+                        </div>
+                        <button type="submit" class="w-full bg-zinc-900 text-white font-semibold p-3 rounded-xl">Save Ticket</button>
+                    </form>
+                </div>
+                <div class="lg:col-span-2 bg-white rounded-2xl border shadow-sm overflow-hidden">
+                    <div class="p-3.5 bg-gray-50 border-b font-bold text-xs text-gray-700">Air Ticket Ledger</div>
+                    <table class="w-full text-left text-xs"><tbody id="ticketTableBody" class="divide-y"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 6: HOTEL -->
+        <div id="tab-hotel" class="erp-tab-section hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                <div class="bg-white p-5 rounded-2xl border shadow-sm space-y-3">
+                    <h3 class="font-bold text-gray-900 text-sm border-b pb-2">Book Hotel</h3>
+                    <form class="space-y-2.5 text-xs" onsubmit="submitHotel(event)">
+                        <select id="hotelClientCombo" class="client-combo w-full p-2.5 bg-gray-50 border rounded-xl"></select>
+                        <select id="hotelEmpCombo" class="emp-combo w-full p-2.5 bg-gray-50 border rounded-xl"></select>
+                        <select id="hotelSupplier" class="w-full p-2.5 bg-gray-50 border rounded-xl">
+                            <option value="Direct Hotel">Direct Hotel</option>
+                            <option value="Agoda / Expedia B2B">Agoda / Expedia B2B</option>
+                            <option value="Makkah/Madinah Partner">Makkah/Madinah Partner</option>
+                        </select>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="text" id="hotelCity" required placeholder="City / Country" class="w-full p-2.5 bg-gray-50 border rounded-xl">
+                            <input type="text" id="hotelName" required placeholder="Hotel Name" class="w-full p-2.5 bg-gray-50 border rounded-xl">
+                        </div>
+                        <input type="text" id="hotelRoom" required placeholder="Room Type (e.g. Double / Quad)" class="w-full p-2.5 bg-gray-50 border rounded-xl">
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="date" id="hotelCheckIn" required class="w-full p-2.5 bg-gray-50 border rounded-xl">
+                            <input type="date" id="hotelCheckOut" required class="w-full p-2.5 bg-gray-50 border rounded-xl">
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <input type="number" id="hotelCost" required placeholder="Net Cost" class="w-full p-2.5 bg-gray-50 border rounded-xl text-red-600 font-semibold">
+                            <input type="number" id="hotelPrice" required placeholder="Selling" class="w-full p-2.5 bg-gray-50 border rounded-xl text-green-600 font-semibold">
+                            <input type="number" id="hotelPaid" placeholder="Paid Now" class="w-full p-2.5 bg-gray-50 border rounded-xl font-semibold">
+                        </div>
+                        <button type="submit" class="w-full bg-zinc-900 text-white font-semibold p-3 rounded-xl">Save Hotel</button>
+                    </form>
+                </div>
+                <div class="lg:col-span-2 bg-white rounded-2xl border shadow-sm overflow-hidden">
+                    <div class="p-3.5 bg-gray-50 border-b font-bold text-xs text-gray-700">Hotel Bookings Ledger</div>
+                    <table class="w-full text-left text-xs"><tbody id="hotelTableBody" class="divide-y"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 7: PACKAGE -->
+        <div id="tab-package" class="erp-tab-section hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                <div class="bg-white p-5 rounded-2xl border shadow-sm space-y-3">
+                    <h3 class="font-bold text-gray-900 text-sm border-b pb-2">Create Package</h3>
+                    <form class="space-y-2.5 text-xs" onsubmit="submitPackage(event)">
+                        <select id="pkgClientCombo" class="client-combo w-full p-2.5 bg-gray-50 border rounded-xl"></select>
+                        <select id="pkgEmpCombo" class="emp-combo w-full p-2.5 bg-gray-50 border rounded-xl"></select>
+                        <select id="pkgSupplier" class="w-full p-2.5 bg-gray-50 border rounded-xl">
+                            <option value="In-House Package">In-House Package</option>
+                            <option value="Saudi Ground Operator">Saudi Ground Operator</option>
+                            <option value="International DMC">International DMC</option>
+                        </select>
+                        <div class="grid grid-cols-2 gap-2">
+                            <select id="pkgCategory" class="w-full p-2.5 bg-gray-50 border rounded-xl">
+                                <option value="Umrah Package">Umrah Package</option>
+                                <option value="Hajj Package">Hajj Package</option>
+                                <option value="International Tour">International Tour</option>
+                                <option value="Domestic Tour">Domestic Tour</option>
+                            </select>
+                            <input type="number" id="pkgPax" required value="2" placeholder="Pax" class="w-full p-2.5 bg-gray-50 border rounded-xl">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="text" id="pkgName" required placeholder="Package Title" class="w-full p-2.5 bg-gray-50 border rounded-xl">
+                            <input type="text" id="pkgDest" required placeholder="Destination" class="w-full p-2.5 bg-gray-50 border rounded-xl">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="date" id="pkgDate" required class="w-full p-2.5 bg-gray-50 border rounded-xl">
+                            <input type="text" id="pkgServices" required placeholder="Services Included" class="w-full p-2.5 bg-gray-50 border rounded-xl">
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <input type="number" id="pkgCost" required placeholder="Net Cost" class="w-full p-2.5 bg-gray-50 border rounded-xl text-red-600 font-semibold">
+                            <input type="number" id="pkgPrice" required placeholder="Selling" class="w-full p-2.5 bg-gray-50 border rounded-xl text-green-600 font-semibold">
+                            <input type="number" id="pkgPaid" placeholder="Paid Now" class="w-full p-2.5 bg-gray-50 border rounded-xl font-semibold">
+                        </div>
+                        <button type="submit" class="w-full bg-zinc-900 text-white font-semibold p-3 rounded-xl">Save Package</button>
+                    </form>
+                </div>
+                <div class="lg:col-span-2 bg-white rounded-2xl border shadow-sm overflow-hidden">
+                    <div class="p-3.5 bg-gray-50 border-b font-bold text-xs text-gray-700">Tour & Umrah Packages Ledger</div>
+                    <table class="w-full text-left text-xs"><tbody id="packageTableBody" class="divide-y"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 8: EXPENSES -->
+        <div id="tab-expenses" class="erp-tab-section hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+Log Office Expense
+
+
+
+Office Rent & Utilities
+Marketing & Ads
+Staff Salary & Bonus
+Internet & Misc
+
+
+
+
+
+
+Save Expense
+
+
+
+Office Expenses Ledger
+Add Employee
+
+
+
+
+
+
+
+
+Save Employee
+
+
+
+Employee Roster
+Overview
+Client
+Passport
+Visa
+Ticket
+Hotel
+Package
+Expenses
+HR
+CM Travels & Tours
+Jam-Jam Shopping Center (2nd Floor), 97, West Kafrul, Taltala, Sher-E-Bangla Nagar, Dhaka
+
+
+INV-001
+Date: --
+
+
+
+Billed ToClient
+Handled ByAgent
+
+	BDT 0.00
+
+Print / Save PDF
+Close
