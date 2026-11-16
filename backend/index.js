@@ -11,174 +11,173 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }
 });
 
+// Auto-ensure clean standalone columns exist without breaking old tables
+async function initSchema() {
+  try {
+    await pool.query(`
+      ALTER TABLE visa_bookings ADD COLUMN IF NOT EXISTS customer_name VARCHAR(150);
+      ALTER TABLE visa_bookings ADD COLUMN IF NOT EXISTS employee_name VARCHAR(150);
+      ALTER TABLE visa_bookings ADD COLUMN IF NOT EXISTS supplier_name VARCHAR(150);
+      ALTER TABLE flight_tickets ADD COLUMN IF NOT EXISTS customer_name VARCHAR(150);
+      ALTER TABLE flight_tickets ADD COLUMN IF NOT EXISTS employee_name VARCHAR(150);
+      ALTER TABLE flight_tickets ADD COLUMN IF NOT EXISTS supplier_name VARCHAR(150);
+      ALTER TABLE hotel_bookings ADD COLUMN IF NOT EXISTS customer_name VARCHAR(150);
+      ALTER TABLE hotel_bookings ADD COLUMN IF NOT EXISTS employee_name VARCHAR(150);
+      ALTER TABLE hotel_bookings ADD COLUMN IF NOT EXISTS supplier_name VARCHAR(150);
+      ALTER TABLE tour_packages ADD COLUMN IF NOT EXISTS customer_name VARCHAR(150);
+      ALTER TABLE tour_packages ADD COLUMN IF NOT EXISTS employee_name VARCHAR(150);
+      ALTER TABLE tour_packages ADD COLUMN IF NOT EXISTS supplier_name VARCHAR(150);
+      ALTER TABLE passports ADD COLUMN IF NOT EXISTS holder_name VARCHAR(150);
+      ALTER TABLE passports ADD COLUMN IF NOT EXISTS phone VARCHAR(50);
+      ALTER TABLE office_expenses ADD COLUMN IF NOT EXISTS employee_name VARCHAR(150);
+    `);
+  } catch (e) { console.log("Schema sync:", e.message); }
+}
+initSchema();
+
+// 1. OVERVIEW STATS
 app.get('/api/dashboard-stats', async (req, res) => {
   try {
-    const vStat = await pool.query("SELECT COUNT(*)::int as cnt, COALESCE(SUM(selling_price),0) as sales, COALESCE(SUM(margin_earned),0) as profit, COALESCE(SUM(selling_price - COALESCE(amount_paid, selling_price)),0) as due FROM visa_bookings");
-    const fStat = await pool.query("SELECT COUNT(*)::int as cnt, COALESCE(SUM(selling_price),0) as sales, COALESCE(SUM(margin_earned),0) as profit, COALESCE(SUM(selling_price - COALESCE(amount_paid, selling_price)),0) as due FROM flight_tickets");
-    const hStat = await pool.query("SELECT COUNT(*)::int as cnt, COALESCE(SUM(selling_price),0) as sales, COALESCE(SUM(margin_earned),0) as profit, COALESCE(SUM(selling_price - COALESCE(amount_paid, selling_price)),0) as due FROM hotel_bookings");
-    const pStat = await pool.query("SELECT COUNT(*)::int as cnt, COALESCE(SUM(selling_price),0) as sales, COALESCE(SUM(margin_earned),0) as profit, COALESCE(SUM(selling_price - COALESCE(amount_paid, selling_price)),0) as due FROM tour_packages");
-    const allExp = await pool.query("SELECT COALESCE(SUM(amount),0) as total FROM office_expenses");
-    const lastMonthExp = await pool.query("SELECT COALESCE(SUM(amount),0) as total FROM office_expenses WHERE expense_date >= CURRENT_DATE - INTERVAL '30 days'");
+    const v = (await pool.query("SELECT COUNT(*)::int as cnt, COALESCE(SUM(selling_price),0) as sales, COALESCE(SUM(margin_earned),0) as profit, COALESCE(SUM(selling_price - COALESCE(amount_paid, selling_price)),0) as due FROM visa_bookings")).rows[0];
+    const f = (await pool.query("SELECT COUNT(*)::int as cnt, COALESCE(SUM(selling_price),0) as sales, COALESCE(SUM(margin_earned),0) as profit, COALESCE(SUM(selling_price - COALESCE(amount_paid, selling_price)),0) as due FROM flight_tickets")).rows[0];
+    const h = (await pool.query("SELECT COUNT(*)::int as cnt, COALESCE(SUM(selling_price),0) as sales, COALESCE(SUM(margin_earned),0) as profit, COALESCE(SUM(selling_price - COALESCE(amount_paid, selling_price)),0) as due FROM hotel_bookings")).rows[0];
+    const p = (await pool.query("SELECT COUNT(*)::int as cnt, COALESCE(SUM(selling_price),0) as sales, COALESCE(SUM(margin_earned),0) as profit, COALESCE(SUM(selling_price - COALESCE(amount_paid, selling_price)),0) as due FROM tour_packages")).rows[0];
+    const expAll = parseFloat((await pool.query("SELECT COALESCE(SUM(amount),0) as total FROM office_expenses")).rows[0].total);
+    const exp30 = parseFloat((await pool.query("SELECT COALESCE(SUM(amount),0) as total FROM office_expenses WHERE expense_date >= CURRENT_DATE - INTERVAL '30 days'")).rows[0].total);
 
-    const v = vStat.rows.at(0), f = fStat.rows.at(0), h = hStat.rows.at(0), p = pStat.rows.at(0);
     const totalSales = parseFloat(v.sales) + parseFloat(f.sales) + parseFloat(h.sales) + parseFloat(p.sales);
     const grossProfit = parseFloat(v.profit) + parseFloat(f.profit) + parseFloat(h.profit) + parseFloat(p.profit);
-    const totalExpenses = parseFloat(allExp.rows.at(0).total);
 
     res.json({
       totalSales,
-      grossProfit,
-      totalExpenses,
-      operatingProfit: grossProfit - totalExpenses,
+      operatingProfit: grossProfit - expAll,
       customerDue: parseFloat(v.due) + parseFloat(f.due) + parseFloat(h.due) + parseFloat(p.due),
-      last30DaysExpenses: parseFloat(lastMonthExp.rows.at(0).total),
-      visas: { count: v.cnt, amount: parseFloat(v.sales), profit: parseFloat(v.profit) },
-      tickets: { count: f.cnt, amount: parseFloat(f.sales), profit: parseFloat(f.profit) },
-      hotels: { count: h.cnt, amount: parseFloat(h.sales), profit: parseFloat(h.profit) },
-      packages: { count: p.cnt, amount: parseFloat(p.sales), profit: parseFloat(p.profit) }
+      last30DaysExpenses: exp30,
+      visas: { count: v.cnt, amount: parseFloat(v.sales) },
+      tickets: { count: f.cnt, amount: parseFloat(f.sales) },
+      hotels: { count: h.cnt, amount: parseFloat(h.sales) },
+      packages: { count: p.cnt, amount: parseFloat(p.sales) }
     });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// 2. PAYROLL
 app.get('/api/payroll/:employeeId', async (req, res) => {
   const id = parseInt(req.params.employeeId, 10);
   try {
     const empRes = await pool.query("SELECT * FROM employees WHERE employee_id = $1", [id]);
-    if (empRes.rows.length === 0) return res.status(404).json({ error: 'Employee not found' });
-    const emp = empRes.rows.at(0);
+    if (!empRes.rows.length) return res.status(404).json({ error: 'Not found' });
+    const emp = empRes.rows[0];
 
-    const vM = await pool.query("SELECT COALESCE(SUM(margin_earned), 0) as sum FROM visa_bookings WHERE employee_id = $1", [id]);
-    const fM = await pool.query("SELECT COALESCE(SUM(margin_earned), 0) as sum FROM flight_tickets WHERE employee_id = $1", [id]);
-    const hM = await pool.query("SELECT COALESCE(SUM(margin_earned), 0) as sum FROM hotel_bookings WHERE employee_id = $1", [id]);
-    const pM = await pool.query("SELECT COALESCE(SUM(margin_earned), 0) as sum FROM tour_packages WHERE employee_id = $1", [id]);
+    const vM = parseFloat((await pool.query("SELECT COALESCE(SUM(margin_earned),0) as s FROM visa_bookings WHERE employee_id=$1", [id])).rows[0].s);
+    const fM = parseFloat((await pool.query("SELECT COALESCE(SUM(margin_earned),0) as s FROM flight_tickets WHERE employee_id=$1", [id])).rows[0].s);
+    const hM = parseFloat((await pool.query("SELECT COALESCE(SUM(margin_earned),0) as s FROM hotel_bookings WHERE employee_id=$1", [id])).rows[0].s);
+    const pM = parseFloat((await pool.query("SELECT COALESCE(SUM(margin_earned),0) as s FROM tour_packages WHERE employee_id=$1", [id])).rows[0].s);
 
-    const totalMargin = parseFloat(vM.rows.at(0).sum) + parseFloat(fM.rows.at(0).sum) + parseFloat(hM.rows.at(0).sum) + parseFloat(pM.rows.at(0).sum);
+    const totalMargin = vM + fM + hM + pM;
     const commissionEarned = totalMargin * (parseFloat(emp.commission_rate) / 100);
     res.json({ name: emp.name, role: emp.role, baseSalary: parseFloat(emp.base_salary), salesMarginGenerated: totalMargin, commissionEarned, netPayout: parseFloat(emp.base_salary) + commissionEarned });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// 3. CLIENT (Single Table)
+app.get('/api/customers', async (req, res) => {
+  try {
+    const r = await pool.query("SELECT * FROM customers ORDER BY customer_id DESC");
+    res.json(r.rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/customer/register', async (req, res) => {
+  const { name, phone, companyName } = req.body;
+  try {
+    const r = await pool.query("INSERT INTO customers (name, phone, company_name) VALUES ($1,$2,$3) RETURNING *", [name, phone, companyName || 'Individual']);
+    res.status(201).json({ success: true, customer: r.rows[0] });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// 4. PASSPORT (Single Table)
+app.get('/api/passports', async (req, res) => {
+  try {
+    const r = await pool.query("SELECT * FROM passports ORDER BY passport_id DESC");
+    res.json(r.rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/passport/submit', async (req, res) => {
+  const { customerId, holderName, phone, passportNumber, expiryDate } = req.body;
+  try {
+    const r = await pool.query("INSERT INTO passports (customer_id, holder_name, phone, passport_number, expiry_date) VALUES ($1,$2,$3,$4,$5) RETURNING *", [customerId || null, holderName, phone, passportNumber.toUpperCase(), expiryDate]);
+    res.status(201).json({ success: true, record: r.rows[0] });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// 5. VISA (Single Table)
 app.get('/api/visas', async (req, res) => {
   try {
-    const r = await pool.query("SELECT v.*, c.name as customer_name FROM visa_bookings v LEFT JOIN customers c ON v.customer_id = c.customer_id ORDER BY v.visa_booking_id DESC");
+    const r = await pool.query("SELECT * FROM visa_bookings ORDER BY visa_booking_id DESC");
     res.json(r.rows);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.post('/api/visa/submit', async (req, res) => {
-  const { customerId, employeeId, country, visaType, supplierCost, sellingPrice, amountPaid } = req.body;
-  const paid = amountPaid !== undefined && amountPaid !== '' ? parseFloat(amountPaid) : parseFloat(sellingPrice);
+  const { customerId, customerName, employeeId, employeeName, supplierName, country, visaType, supplierCost, sellingPrice, amountPaid } = req.body;
+  const paid = amountPaid !== '' && amountPaid !== undefined ? parseFloat(amountPaid) : parseFloat(sellingPrice);
   try {
-    const r = await pool.query("INSERT INTO visa_bookings (customer_id, employee_id, country, visa_type, supplier_cost, selling_price, amount_paid) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *", [customerId, employeeId, country, visaType, parseFloat(supplierCost), parseFloat(sellingPrice), paid]);
-    res.status(201).json({ success: true, record: r.rows.at(0) });
+    const r = await pool.query("INSERT INTO visa_bookings (customer_id, customer_name, employee_id, employee_name, supplier_name, country, visa_type, supplier_cost, selling_price, amount_paid) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *", [customerId || null, customerName, employeeId || null, employeeName, supplierName, country, visaType, parseFloat(supplierCost), parseFloat(sellingPrice), paid]);
+    res.status(201).json({ success: true, record: r.rows[0] });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.put('/api/visa/update/:id', async (req, res) => {
-  const { country, visaType, trackingStatus, supplierCost, sellingPrice } = req.body;
-  try {
-    await pool.query("UPDATE visa_bookings SET country=$1, visa_type=$2, tracking_status=$3, supplier_cost=$4, selling_price=$5 WHERE visa_booking_id=$6", [country, visaType, trackingStatus, parseFloat(supplierCost), parseFloat(sellingPrice), parseInt(req.params.id, 10)]);
-    res.json({ success: true });
-  } catch (err) { res.status(500).json({ error: err.message }); }
-});
-
+// 6. TICKET (Single Table)
 app.get('/api/tickets', async (req, res) => {
   try {
-    const r = await pool.query("SELECT t.*, c.name as customer_name FROM flight_tickets t LEFT JOIN customers c ON t.customer_id = c.customer_id ORDER BY t.ticket_id DESC");
+    const r = await pool.query("SELECT * FROM flight_tickets ORDER BY ticket_id DESC");
     res.json(r.rows);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.post('/api/ticket/submit', async (req, res) => {
-  const { customerId, employeeId, gdsPnr, airlineCode, route, supplierCost, sellingPrice, amountPaid } = req.body;
-  const paid = amountPaid !== undefined && amountPaid !== '' ? parseFloat(amountPaid) : parseFloat(sellingPrice);
+  const { customerId, customerName, employeeId, employeeName, supplierName, gdsPnr, airlineCode, route, supplierCost, sellingPrice, amountPaid } = req.body;
+  const paid = amountPaid !== '' && amountPaid !== undefined ? parseFloat(amountPaid) : parseFloat(sellingPrice);
   try {
-    const r = await pool.query("INSERT INTO flight_tickets (customer_id, employee_id, gds_pnr, airline_code, route, supplier_cost, selling_price, amount_paid) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *", [customerId, employeeId, gdsPnr, airlineCode, route, parseFloat(supplierCost), parseFloat(sellingPrice), paid]);
-    res.status(201).json({ success: true, record: r.rows.at(0) });
+    const r = await pool.query("INSERT INTO flight_tickets (customer_id, customer_name, employee_id, employee_name, supplier_name, gds_pnr, airline_code, route, supplier_cost, selling_price, amount_paid) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *", [customerId || null, customerName, employeeId || null, employeeName, supplierName, gdsPnr.toUpperCase(), airlineCode.toUpperCase(), route.toUpperCase(), parseFloat(supplierCost), parseFloat(sellingPrice), paid]);
+    res.status(201).json({ success: true, record: r.rows[0] });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.put('/api/ticket/update/:id', async (req, res) => {
-  const { gdsPnr, airlineCode, route, supplierCost, sellingPrice } = req.body;
-  try {
-    await pool.query("UPDATE flight_tickets SET gds_pnr=$1, airline_code=$2, route=$3, supplier_cost=$4, selling_price=$5 WHERE ticket_id=$6", [gdsPnr.toUpperCase(), airlineCode.toUpperCase(), route.toUpperCase(), parseFloat(supplierCost), parseFloat(sellingPrice), parseInt(req.params.id, 10)]);
-    res.json({ success: true });
-  } catch (err) { res.status(500).json({ error: err.message }); }
-});
-
+// 7. HOTEL (Single Table)
 app.get('/api/hotels', async (req, res) => {
   try {
-    const r = await pool.query("SELECT h.*, c.name as customer_name FROM hotel_bookings h LEFT JOIN customers c ON h.customer_id = c.customer_id ORDER BY h.hotel_booking_id DESC");
+    const r = await pool.query("SELECT * FROM hotel_bookings ORDER BY hotel_booking_id DESC");
     res.json(r.rows);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.post('/api/hotel/submit', async (req, res) => {
-  const { customerId, employeeId, city, hotelName, roomType, checkIn, checkOut, supplierCost, sellingPrice, amountPaid } = req.body;
-  const paid = amountPaid !== undefined && amountPaid !== '' ? parseFloat(amountPaid) : parseFloat(sellingPrice);
+  const { customerId, customerName, employeeId, employeeName, supplierName, city, hotelName, roomType, checkIn, checkOut, supplierCost, sellingPrice, amountPaid } = req.body;
+  const paid = amountPaid !== '' && amountPaid !== undefined ? parseFloat(amountPaid) : parseFloat(sellingPrice);
   try {
-    const r = await pool.query("INSERT INTO hotel_bookings (customer_id, employee_id, city, hotel_name, room_type, check_in, check_out, supplier_cost, selling_price, amount_paid) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *", [customerId, employeeId, city, hotelName, roomType, checkIn, checkOut, parseFloat(supplierCost), parseFloat(sellingPrice), paid]);
-    res.status(201).json({ success: true, record: r.rows.at(0) });
-  } catch (err) { res.status(500).json({ error: err.message }); }
+const r = await pool.query("INSERT INTO hotel_bookings (customer_id, customer_name, employee_id, employee_name, supplier_name, city, hotel_name, room_type, check_in, check_out, supplier_cost, selling_price, amount_paid) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING *", [customerId || null, customerName, employeeId || null, employeeName, supplierName, city, hotelName, roomType, checkIn, checkOut, parseFloat(supplierCost), parseFloat(sellingPrice), paid]);
+res.status(201).json({ success: true, record: r.rows[0] });
+} catch (err) { res.status(500).json({ error: err.message }); }
 });
-
-app.put('/api/hotel/update/:id', async (req, res) => {
-  const { city, hotelName, roomType, supplierCost, sellingPrice } = req.body;
-  try {
-    await pool.query("UPDATE hotel_bookings SET city=$1, hotel_name=$2, room_type=$3, supplier_cost=$4, selling_price=$5 WHERE hotel_booking_id=$6", [city, hotelName, roomType, parseFloat(supplierCost), parseFloat(sellingPrice), parseInt(req.params.id, 10)]);
-    res.json({ success: true });
-  } catch (err) { res.status(500).json({ error: err.message }); }
-});
-
+// 8. PACKAGE (Single Table)
 app.get('/api/packages', async (req, res) => {
-  try {
-    const r = await pool.query("SELECT p.*, c.name as customer_name FROM tour_packages p LEFT JOIN customers c ON p.customer_id = c.customer_id ORDER BY p.package_id DESC");
-    res.json(r.rows);
-  } catch (err) { res.status(500).json({ error: err.message }); }
-});
-
-app.post('/api/package/submit', async (req, res) => {
-  const { customerId, employeeId, packageName, category, destination, travelersCount, departureDate, includedServices, supplierCost, sellingPrice, amountPaid } = req.body;
-  const paid = amountPaid !== undefined && amountPaid !== '' ? parseFloat(amountPaid) : parseFloat(sellingPrice);
-  try {
-const r = await pool.query("INSERT INTO tour_packages (customer_id, employee_id, package_name, category, destination, travelers_count, departure_date, included_services, supplier_cost, selling_price, amount_paid) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *", [customerId, employeeId, packageName, category, destination, parseInt(travelersCount, 10) || 1, departureDate, includedServices, parseFloat(supplierCost), parseFloat(sellingPrice), paid]);
-res.status(201).json({ success: true, record: r.rows.at(0) });
-} catch (err) { res.status(500).json({ error: err.message }); }
-});
-app.put('/api/package/update/:id', async (req, res) => {
-const { packageName, destination, travelersCount, includedServices, supplierCost, sellingPrice } = req.body;
 try {
-await pool.query("UPDATE tour_packages SET package_name=$1, destination=$2, travelers_count=$3, included_services=$4, supplier_cost=$5, selling_price=$6 WHERE package_id=$7", [packageName, destination, parseInt(travelersCount, 10) || 1, includedServices, parseFloat(supplierCost), parseFloat(sellingPrice), parseInt(req.params.id, 10)]);
-res.json({ success: true });
-} catch (err) { res.status(500).json({ error: err.message }); }
-});
-app.get('/api/customers', async (req, res) => {
-try {
-const r = await pool.query("SELECT c.customer_id, c.name, c.phone, c.company_name, p.passport_number, p.expiry_date FROM customers c LEFT JOIN passports p ON c.customer_id = p.customer_id ORDER BY c.customer_id DESC");
+const r = await pool.query("SELECT * FROM tour_packages ORDER BY package_id DESC");
 res.json(r.rows);
 } catch (err) { res.status(500).json({ error: err.message }); }
 });
-app.post('/api/customer/register', async (req, res) => {
-const { name, phone, email, companyName, passportNumber, expiryDate } = req.body;
+app.post('/api/package/submit', async (req, res) => {
+const { customerId, customerName, employeeId, employeeName, supplierName, packageName, category, destination, travelersCount, departureDate, includedServices, supplierCost, sellingPrice, amountPaid } = req.body;
+const paid = amountPaid !== '' && amountPaid !== undefined ? parseFloat(amountPaid) : parseFloat(sellingPrice);
 try {
-const cRes = await pool.query("INSERT INTO customers (name, phone, email, company_name) VALUES ($1,$2,$3,$4) RETURNING *", [name, phone, email || null, companyName || null]);
-const cust = cRes.rows.at(0);
-if (passportNumber && expiryDate) {
-await pool.query("INSERT INTO passports (customer_id, passport_number, expiry_date) VALUES ($1,$2,$3)", [cust.customer_id, passportNumber.toUpperCase(), expiryDate]);
-}
-res.status(201).json({ success: true, customer: cust });
+const r = await pool.query("INSERT INTO tour_packages (customer_id, customer_name, employee_id, employee_name, supplier_name, package_name, category, destination, travelers_count, departure_date, included_services, supplier_cost, selling_price, amount_paid) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) RETURNING *", [customerId || null, customerName, employeeId || null, employeeName, supplierName, packageName, category, destination, parseInt(travelersCount, 10) || 1, departureDate, includedServices, parseFloat(supplierCost), parseFloat(sellingPrice), paid]);
+res.status(201).json({ success: true, record: r.rows[0] });
 } catch (err) { res.status(500).json({ error: err.message }); }
 });
-app.put('/api/customer/update/:id', async (req, res) => {
-const { name, phone, passportNumber, expiryDate } = req.body;
-try {
-await pool.query("UPDATE customers SET name=$1, phone=$2 WHERE customer_id=$3", [name, phone, parseInt(req.params.id, 10)]);
-if (passportNumber && expiryDate) {
-await pool.query("INSERT INTO passports (customer_id, passport_number, expiry_date) VALUES ($1,$2,$3) ON CONFLICT (passport_number) DO UPDATE SET expiry_date=$3", [parseInt(req.params.id, 10), passportNumber.toUpperCase(), expiryDate]);
-}
-res.json({ success: true });
-} catch (err) { res.status(500).json({ error: err.message }); }
-});
+// 9. EXPENSES (Single Table)
 app.get('/api/expenses', async (req, res) => {
 try {
 const r = await pool.query("SELECT * FROM office_expenses ORDER BY expense_date DESC, expense_id DESC");
@@ -186,29 +185,13 @@ res.json(r.rows);
 } catch (err) { res.status(500).json({ error: err.message }); }
 });
 app.post('/api/expense/submit', async (req, res) => {
-const { category, description, amount, expenseDate, loggedBy } = req.body;
+const { category, description, amount, expenseDate, employeeName } = req.body;
 try {
-const r = await pool.query("INSERT INTO office_expenses (category, description, amount, expense_date, logged_by) VALUES ($1,$2,$3,$4,$5) RETURNING *", [category, description, parseFloat(amount), expenseDate, loggedBy]);
-res.status(201).json({ success: true, record: r.rows.at(0) });
+const r = await pool.query("INSERT INTO office_expenses (category, description, amount, expense_date, employee_name) VALUES ($1,$2,$3,$4,$5) RETURNING *", [category, description, parseFloat(amount), expenseDate, employeeName]);
+res.status(201).json({ success: true, record: r.rows[0] });
 } catch (err) { res.status(500).json({ error: err.message }); }
 });
-app.put('/api/expense/update/:id', async (req, res) => {
-const { category, description, amount } = req.body;
-try {
-await pool.query("UPDATE office_expenses SET category=$1, description=$2, amount=$3 WHERE expense_id=$4", [category, description, parseFloat(amount), parseInt(req.params.id, 10)]);
-res.json({ success: true });
-} catch (err) { res.status(500).json({ error: err.message }); }
-});
-app.put('/api/payment/collect', async (req, res) => {
-const { type, id, newPaidAmount } = req.body;
-const map = { visa: ['visa_bookings', 'visa_booking_id'], ticket: ['flight_tickets', 'ticket_id'], hotel: ['hotel_bookings', 'hotel_booking_id'], package: ['tour_packages', 'package_id'] };
-const t = map[type];
-if (!t) return res.status(400).json({ error: 'Invalid type' });
-try {
-await pool.query("UPDATE " + t.at(0) + " SET amount_paid=$1 WHERE " + t.at(1) + "=$2", [parseFloat(newPaidAmount), parseInt(id, 10)]);
-res.json({ success: true });
-} catch (err) { res.status(500).json({ error: err.message }); }
-});
+// 10. HR / EMPLOYEES (Single Table)
 app.get('/api/employees', async (req, res) => {
 try {
 const r = await pool.query("SELECT employee_id, name, email, role, base_salary, commission_rate FROM employees ORDER BY employee_id ASC");
@@ -219,13 +202,16 @@ app.post('/api/employee/add', async (req, res) => {
 const { name, email, role, baseSalary, commissionRate } = req.body;
 try {
 const r = await pool.query("INSERT INTO employees (name, email, role, base_salary, commission_rate, password) VALUES ($1,$2,$3,$4,$5,'open') RETURNING employee_id, name", [name, email.trim(), role, parseFloat(baseSalary), parseFloat(commissionRate)]);
-res.status(201).json({ success: true, employee: r.rows.at(0) });
+res.status(201).json({ success: true, employee: r.rows[0] });
 } catch (err) { res.status(500).json({ error: err.message }); }
 });
-app.put('/api/employee/update/:id', async (req, res) => {
-const { name, role, baseSalary, commissionRate } = req.body;
+app.put('/api/payment/collect', async (req, res) => {
+const { type, id, newPaidAmount } = req.body;
+const map = { visa: ['visa_bookings', 'visa_booking_id'], ticket: ['flight_tickets', 'ticket_id'], hotel: ['hotel_bookings', 'hotel_booking_id'], package: ['tour_packages', 'package_id'] };
+const t = map[type];
+if (!t) return res.status(400).json({ error: 'Invalid type' });
 try {
-await pool.query("UPDATE employees SET name=$1, role=$2, base_salary=$3, commission_rate=$4 WHERE employee_id=$5", [name, role, parseFloat(baseSalary), parseFloat(commissionRate), parseInt(req.params.id, 10)]);
+await pool.query("UPDATE " + t[0] + " SET amount_paid=$1 WHERE " + t[1] + "=$2", [parseFloat(newPaidAmount), parseInt(id, 10)]);
 res.json({ success: true });
 } catch (err) { res.status(500).json({ error: err.message }); }
 });
